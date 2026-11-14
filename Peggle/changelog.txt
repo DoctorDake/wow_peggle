@@ -1,5 +1,13 @@
 Changelog
 
+v3.1
+- WoW Forever support (interface 16001, Midnight-based client API)
+- Added Compat.lua: backdrops, renamed/removed frame templates, chat, friends list and calendar API shims
+- Dropdown menus no longer depend on the deprecated UIDropDownMenu
+- Talent buttons, tab sparkles and the easter egg toast no longer depend on removed Blizzard templates
+- Fixed colour textures (SetColorTexture) and the friends invite list (C_FriendList)
+- Ignore addon/chat messages that arrive as secret values
+
 v2.2
 - Fixed /peggleloot
 
