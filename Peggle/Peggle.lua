@@ -1,4 +1,7 @@
-local AddOn, config = ...
+-- The main chunk sits at Lua's 200-local limit, so the unused addon-name slot
+-- is reused for the compatibility table instead of declaring another local.
+local compat, config = ...
+compat = config.compat
 local LEVELS = config.LEVELS
 local LEVEL_NAMES = config.LEVEL_NAMES
 
@@ -637,9 +640,9 @@ PeggleProfile.lastDuels = {};
 PeggleProfile.levelTracking = {};
 PeggleProfile.duelTracking = {};
 function o.MinuteDifference(h, u, S, a, i)
-	local date=C_Calendar.GetDate()
+	local date=compat.GetDate()
 	local t, l, c, r = date.weekday, date.month, date.monthDay, date.year;
-	local d, s = GetGameTime();
+	local d, s = compat.GetGameTime();
 	local n = 0;
 	if(r - i > 1)then
 		n = 525600;
@@ -1008,13 +1011,13 @@ local function Ve()
 			t, o, n = .5, .5, .5;
 		end
 		if(t == .5)then
-			SetDesaturation(e.icon, true);
-			--getglobal(e.rank:GetName().."Border"):Hide();
+			compat.SetDesaturation(e.icon, true);
+			--compat.Child(e.rank, "Border"):Hide();
 			e.rank:Hide();
 			e.border:SetVertexColor(t, o, n);
 		else
-			SetDesaturation(e.icon, false);
-			--getglobal(e.rank:GetName().."Border"):Show();
+			compat.SetDesaturation(e.icon, false);
+			--compat.Child(e.rank, "Border"):Show();
 			e.rank:Show();
 			e.rank:SetVertexColor(t, o, n);
 			e.border:SetVertexColor(t, o, n);
@@ -1268,10 +1271,10 @@ local function Et(o, n)
 	e.stats[1] = e.stats[1] + 1;
 	t.shooter.ball:Hide();
 	for e = 1, ce do
-		getglobal("polyLine"..e):Hide();
+		compat.getglobal("polyLine"..e):Hide();
 	end
 	for e = 1, q do
-		getglobal("pathPiece"..e):Hide();
+		compat.getglobal("pathPiece"..e):Hide();
 	end
 	ne = nil;
 	if(K > 0)then
@@ -1468,10 +1471,10 @@ local function Ae(o, h, p, T)
 		r.trail[e]:Hide();
 	end
 	for e = 1, ce do
-		getglobal("polyLine"..e):Hide();
+		compat.getglobal("polyLine"..e):Hide();
 	end
 	for e = 1, q do
-		getglobal("pathPiece"..e):Hide();
+		compat.getglobal("pathPiece"..e):Hide();
 	end
 	for e = 1, #d.hitPegStack do
 		u(d.hitPegStack, 1);
@@ -2132,7 +2135,7 @@ e.sparkleFunc = function(e, n)
 end
 local function De(a, c, n, d, o, r, l)
 	local o = e.artCut[o];
-	local n = CreateFrame("Frame", "", n);
+	local n = compat.CreateFrame("Frame", "", n);
 	n:SetPoint("Topleft", a, 0);
 	n:SetWidth(i((o[2] - o[1]) * 512 + .5));
 	n:SetHeight(i((o[4] - o[3]) * 256 + .5));
@@ -2151,7 +2154,7 @@ local function De(a, c, n, d, o, r, l)
 	n:SetScript("OnLeave", nt);
 	if(l)then
 		t.sparkCount = (t.sparkCount or(0)) + 1
-		local t = CreateFrame("Frame", "PeggleSparks"..t.sparkCount, n, "AutoCastShineTemplate")
+		local t = compat.CreateSparkFrame("PeggleSparks"..t.sparkCount, n)
 		t:ClearAllPoints();
 		t:SetPoint("Topleft", 6,  - 6);
 		t:SetWidth(n:GetWidth() - 12);
@@ -2159,7 +2162,6 @@ local function De(a, c, n, d, o, r, l)
 		t:SetScript("OnUpdate", e.sparkleFunc);
 		n.sparks = t;
 		n.sparks:Hide();
-		t.sparkles = {};
 		if(l == 1)then
 			t.speed = {2, 2, 2, 2};
 			t.timer = {0, .5, 1, 1.5};
@@ -2173,7 +2175,6 @@ local function De(a, c, n, d, o, r, l)
 		local n = t:GetName();
 		local e;
 		for e = 1, 16 do
-			s(t.sparkles, getglobal(n..e));
 			t.sparkles[e]:Show();
 			t.sparkles[e]:SetVertexColor(1, 1, 0);
 		end
@@ -2181,13 +2182,13 @@ local function De(a, c, n, d, o, r, l)
 	return n, (a + n:GetWidth());
 end
 local function Je(r, o, l, e, i, a, d, t, n)
-	local e = CreateFrame("EditBox", "PeggleTextBox_"..e, i, "InputBoxTemplate");
+	local e = compat.CreateFrame("EditBox", "PeggleTextBox_"..e, i, "InputBoxTemplate");
 	e:SetPoint("Topleft", r + 6,  - (o - 4))
 	e:SetWidth(l);
 	e:SetHeight(32);
 	e:SetAutoFocus(false);
-	e:SetNumeric(a);
-	e:SetMaxLetters(d);
+	e:SetNumeric(a and true or false);
+	e:SetMaxLetters(d or 0);
 	e:SetHitRectInsets(0, 0, 8, 8);
 	e:Show();
 	if(t)then
@@ -2203,17 +2204,17 @@ local function Je(r, o, l, e, i, a, d, t, n)
 	return e, o + 24;
 end
 local function x(n, a, h, o, S, t, l, d, r, c, i, s)
-	local t = CreateFrame("CheckButton", "PeggleCheckbox_"..o, t, "OptionsCheckButtonTemplate");
+	local t = compat.CreateFrame("CheckButton", "PeggleCheckbox_"..o, t, "OptionsCheckButtonTemplate");
 	t:SetWidth(21);
 	t:SetHeight(21);
 	t:SetPoint("Topleft", n,  - a);
-	local n = getglobal(t:GetName().."Text");
+	local n = compat.Child(t, "Text");
 	if(s)then
-		n:SetFont(e.artPath.."OVERLOAD.ttf", 10);
+		n:SetFont(e.artPath.."OVERLOAD.ttf", 10, "");
 		t:SetWidth(17);
 		t:SetHeight(17);
 	else
-		n:SetFont(STANDARD_TEXT_FONT, 14);
+		n:SetFont(STANDARD_TEXT_FONT, 14, "");
 	end
 	n:SetJustifyV("Top");
 	n:SetJustifyH("Left");
@@ -2238,21 +2239,21 @@ local function x(n, a, h, o, S, t, l, d, r, c, i, s)
 	return t, a + 20;
 end
 function o:CreateSlider(s, d, c, r, n, t, l, S, h, i, p, a, T, g, u, f)
-	local t = CreateFrame("Slider", "PeggleSlider"..n, t, "OptionsSliderTemplate");
+	local t = compat.CreateFrame("Slider", "PeggleSlider"..n, t, "OptionsSliderTemplate");
 	t:SetWidth(c);
-	getglobal(t:GetName().."Thumb"):Show();
+	compat.Child(t, "Thumb"):Show();
 	if(f)then
-		getglobal(t:GetName().."Text"):SetFont(e.artPath.."OVERLOAD.ttf", a or 14);
+		compat.Child(t, "Text"):SetFont(e.artPath.."OVERLOAD.ttf", a or 14, "");
 	else
-		getglobal(t:GetName().."Text"):SetFont(STANDARD_TEXT_FONT, a or 14);
+		compat.Child(t, "Text"):SetFont(STANDARD_TEXT_FONT, a or 14, "");
 	end
-	getglobal(t:GetName().."Text"):SetShadowOffset(1,  - 1);
-	getglobal(t:GetName().."Text"):SetText(r);
-	getglobal(t:GetName().."Text"):SetVertexColor(T or 1, g or 1, u or 0);
-	getglobal(t:GetName().."Low"):SetText("");
-	getglobal(t:GetName().."Low"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-	getglobal(t:GetName().."High"):SetText("");
-	getglobal(t:GetName().."High"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	compat.Child(t, "Text"):SetShadowOffset(1,  - 1);
+	compat.Child(t, "Text"):SetText(r);
+	compat.Child(t, "Text"):SetVertexColor(T or 1, g or 1, u or 0);
+	compat.Child(t, "Low"):SetText("");
+	compat.Child(t, "Low"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	compat.Child(t, "High"):SetText("");
+	compat.Child(t, "High"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	t.valueCaption = o:CreateCaption(0, 0, "", t, a or 14, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	t.valueCaption:ClearAllPoints();
 	t.valueCaption:SetPoint("Topleft", t, "Topright");
@@ -2297,14 +2298,14 @@ end
 function o:CreateCaption(i, r, s, t, n, S, d, c, l, a, o)
 	local t = t:CreateFontString(nil, "Overlay");
 	if(l == true)then
-		t:SetFont(e.artPath.."OVERLOAD.ttf", (n or 10), (o or"Outline"));
+		t:SetFont(e.artPath.."OVERLOAD.ttf", (n or 10), (o or"OUTLINE"));
 	elseif(l == 1)then
-		t:SetFont(e.artPath.."OVERLOAD.ttf", (n or 10), (o or"Outline"));
+		t:SetFont(e.artPath.."OVERLOAD.ttf", (n or 10), (o or"OUTLINE"));
 	else
 		if(a)then
-			t:SetFont(STANDARD_TEXT_FONT, (n or 10));
+			t:SetFont(STANDARD_TEXT_FONT, (n or 10), "");
 		else
-			t:SetFont(STANDARD_TEXT_FONT, (n or 10), (o or"Outline"));
+			t:SetFont(STANDARD_TEXT_FONT, (n or 10), (o or"OUTLINE"));
 		end
 	end
 	t:SetTextColor((S or 1), (d or 1), (c or 1));
@@ -2316,18 +2317,18 @@ end
 local function l(n, l)
 	local o
 	if(l == 1)then
-		local e = UIDropDownMenu_GetCurrentDropDown();
-		UIDropDownMenu_SetText(e, n:GetText(), e);
-		UIDropDownMenu_SetSelectedValue(e, n.value);
+		local e = compat.UIDropDownMenu_GetCurrentDropDown();
+		compat.UIDropDownMenu_SetText(e, n:GetText(), e);
+		compat.UIDropDownMenu_SetSelectedValue(e, n.value);
 		PeggleData.settings.defaultPublish = n.value;
 	elseif l then
 		local e = t.catagoryScreen.frames[2];
 		e.name2:SetText(PeggleProfile.lastDuels[n.value]);
 	else
 		if not n.forced then
-			local t = UIDropDownMenu_GetCurrentDropDown();
-			UIDropDownMenu_SetText(t, n:GetText(), t);
-			UIDropDownMenu_SetSelectedName(t, n:GetText());
+			local t = compat.UIDropDownMenu_GetCurrentDropDown();
+			compat.UIDropDownMenu_SetText(t, n:GetText(), t);
+			compat.UIDropDownMenu_SetSelectedName(t, n:GetText());
 			t.selectedValue = n.value;
 			if(t.updateFunc)then
 				t.updateFunc:SetTexture(e.artPath.."BG"..n.value.."_thumb");
@@ -2337,7 +2338,7 @@ local function l(n, l)
 			n.forced = nil;
 			o = n.selectedValue or(1);
 			local t = string.format(e.locale["_LEVEL_INFO"], o, LEVEL_NAMES[o]);
-			UIDropDownMenu_SetText(n, t, n);
+			compat.UIDropDownMenu_SetText(n, t, n);
 			n.selectedValue = o;
 			if(n.updateFunc)then
 				n.updateFunc:SetTexture(e.artPath.."BG"..o.."_thumb");
@@ -2348,17 +2349,17 @@ local function l(n, l)
 	end
 end
 local function We(o)
-	if(UIDROPDOWNMENU_MENU_LEVEL == 1)then
+	if(compat.UIDROPDOWNMENU_MENU_LEVEL == 1)then
 		local a
 		local n;
 		local n = e.dropInfo;
 		if(o.names)then
-			getglobal("DropDownList1").maxWidth = 240;
+			compat.dropDownMaxWidth = 240;
 			table.wipe(n);
 			n.text = e.locale["_DUEL_HISTORY"];
 			n.isTitle = true;
 			n.value = 0;
-			UIDropDownMenu_AddButton(n);
+			compat.UIDropDownMenu_AddButton(n);
 			if(PeggleProfile.lastDuels)and(PeggleProfile.lastDuels[1])then
 				for e = 1, #PeggleProfile.lastDuels do
 					table.wipe(n);
@@ -2366,14 +2367,14 @@ local function We(o)
 					n.value = e;
 					n.arg1 = true;
 					n.func = l;
-					UIDropDownMenu_AddButton(n);
+					compat.UIDropDownMenu_AddButton(n);
 				end
 			else
 				table.wipe(n);
 				n.text = e.locale["_DUEL_NO_HISTORY"];
 				n.notClickable = true;
 				n.value = 0;
-				UIDropDownMenu_AddButton(n);
+				compat.UIDropDownMenu_AddButton(n);
 			end
 		elseif(o.publish)then
 			table.wipe(n);
@@ -2387,7 +2388,7 @@ local function We(o)
 				end
 				n.arg1 = 1;
 				n.func = l;
-				UIDropDownMenu_AddButton(n);
+				compat.UIDropDownMenu_AddButton(n);
 			end
 			local a = string.lower(PeggleData.settings.defaultPublish);
 			local e = o:GetParent();
@@ -2401,11 +2402,11 @@ local function We(o)
 				n.value = n.text;
 				n.arg1 = 1;
 				n.func = l;
-				UIDropDownMenu_AddButton(n);
+				compat.UIDropDownMenu_AddButton(n);
 			end
 			PeggleData.settings.defaultPublish = t;
 		else
-			getglobal("DropDownList1").maxWidth = 280;
+			compat.dropDownMaxWidth = 280;
 			for o = 1, #LEVELS do
 				table.wipe(n);
 				n.text = string.format(e.locale["_LEVEL_INFO"], o, LEVEL_NAMES[o]);
@@ -2431,26 +2432,26 @@ local function We(o)
 				end
 				n.checked = nil;
 				n.func = l
-				UIDropDownMenu_AddButton(n);
+				compat.UIDropDownMenu_AddButton(n);
 			end
 		end
 	end
 end
 local function m(t)
 	local n = t.selectedValue;
-	UIDropDownMenu_SetAnchor(t, 0, 0, "Top", t, "Bottom");
-	UIDropDownMenu_Initialize(t, We);
+	compat.UIDropDownMenu_SetAnchor(t, 0, 0, "Top", t, "Bottom");
+	compat.UIDropDownMenu_Initialize(t, We);
 	if(t.publish)then
-		UIDropDownMenu_SetSelectedValue(t, PeggleData.settings.defaultPublish)
+		compat.UIDropDownMenu_SetSelectedValue(t, PeggleData.settings.defaultPublish)
 		n = PeggleData.settings.defaultPublish;
 	else
-		UIDropDownMenu_SetSelectedName(t, string.format(e.locale["_LEVEL_INFO"], t.selectedValue, LEVEL_NAMES[t.selectedValue]));
+		compat.UIDropDownMenu_SetSelectedName(t, string.format(e.locale["_LEVEL_INFO"], t.selectedValue, LEVEL_NAMES[t.selectedValue]));
 	end
 	t.selectedValue = n;
-	UIDropDownMenu_SetWidth(t, t.menuWidth);
+	compat.UIDropDownMenu_SetWidth(t, t.menuWidth);
 end
 local function We(i, n, d, e, l, c, a, r, c)
-	local e = CreateFrame("Frame", "PeggleDropdown_"..e, a, "UIDropDownMenuTemplate");
+	local e = compat.CreateDropDown("PeggleDropdown_"..e, a);
 	e:SetHitRectInsets(10, 10, 0, 0);
 	if(l)then
 		e.text = o:CreateCaption(i, n, l, a, 14, 1, 1, 0, nil, nil);
@@ -2465,13 +2466,13 @@ local function We(i, n, d, e, l, c, a, r, c)
 	e.peggleMenu = true;
 	e.displayMode = "MENU";
 	if(l)then
-		getglobal(e:GetName().."Text"):SetFont(e.text:GetFont());
-		getglobal(e:GetName().."Text"):SetVertexColor(1, 1, 1);
+		compat.Child(e, "Text"):SetFont(e.text:GetFont());
+		compat.Child(e, "Text"):SetVertexColor(1, 1, 1);
 	else
-		getglobal(e:GetName().."Text"):SetFontObject(t.fontObj);
-		getglobal(e:GetName().."Text"):SetVertexColor(1, .82, 0);
+		compat.Child(e, "Text"):SetFontObject(t.fontObj);
+		compat.Child(e, "Text"):SetVertexColor(1, .82, 0);
 	end
-	getglobal(e:GetName().."Text"):SetJustifyH("CENTER");
+	compat.Child(e, "Text"):SetJustifyH("CENTER");
 	e:SetPoint("Topleft", i - 16,  - n);
 	e:SetScript("OnShow", m);
 	return e, n + 30;
@@ -2499,7 +2500,7 @@ local function rt(e)
 	e.hover = nil;
 end
 local function m(c, o, d, n, r, t, s, a, S, l)
-	local t = CreateFrame("Button", "PeggleButton_"..t, s);
+	local t = compat.CreateFrame("Button", "PeggleButton_"..t, s);
 	local n = e.artCut[n];
 	t:SetPoint("TopLeft", c,  - o);
 	t:EnableMouse(true);
@@ -2926,7 +2927,7 @@ local function st(a, i, h, f, S, o, c, g, n, l, d, p)
 		u(a.pointTextQueue, 1);
 	else
 		t = r.foreground:CreateFontString(nil, "Overlay");
-		t:SetFont(e.artPath.."OVERLOAD.ttf", 12, "Outline");
+		t:SetFont(e.artPath.."OVERLOAD.ttf", 12, "OUTLINE");
 		t:SetTextColor(1, 1, 0);
 		t.elapsed = 0;
 		t.Update = a.Update_FloatingText;
@@ -2938,11 +2939,11 @@ local function st(a, i, h, f, S, o, c, g, n, l, d, p)
 	t:SetTextColor((f or 1), (S or 1), (o or 0));
 	t:SetAlpha(1);
 	if t.critText then
-		t:SetFont(e.artPath.."OVERLOAD.ttf", 12, "Outline");
+		t:SetFont(e.artPath.."OVERLOAD.ttf", 12, "OUTLINE");
 	end
 	t.critText = p;
 	if t.critText then
-		t:SetFont(e.artPath.."OVERLOAD.ttf", 24, "Outline");
+		t:SetFont(e.artPath.."OVERLOAD.ttf", 24, "OUTLINE");
 		t:SetTextColor(1, .5, 0)
 	end
 	local o = t:GetStringWidth();
@@ -3049,7 +3050,7 @@ local function le(l, o, n, a)
 		t:ClearAllPoints();
 		Ke = ce
 	else
-		t = getglobal("polyLine"..ce);
+		t = compat.getglobal("polyLine"..ce);
 	end
 	if(t)then
 		rotation = i(atan2(a-o, n-l)or(0)) + 135;
@@ -3071,7 +3072,7 @@ local function Ke(o, n, l, a)
 		t:ClearAllPoints();
 		qe = q
 	else
-		t = getglobal("pathPiece"..q);
+		t = compat.getglobal("pathPiece"..q);
 	end
 	if(t)then
 		t:SetTexture(e.artPath.."path"..a);
@@ -3418,7 +3419,17 @@ local function Ne(o, n)
 		o.elapsed = 0;
 		return;
 	end
-	o.elapsed = xe(o.elapsed, o.elapsed) * J;
+	-- The loop now runs every rendered frame instead of roughly every 33ms.
+	-- Anything that used to advance "once per tick" is scaled by tickScale
+	-- (1 == one old tick) so it keeps its original speed.
+	o.elapsed = xe(o.elapsed, .1);
+	o.tickScale = o.elapsed * 30;
+	o.trailElapsed = (o.trailElapsed or 0) + o.elapsed;
+	if(o.trailElapsed >= 1 / 30)then
+		o.trailElapsed = 0;
+		o.shiftTrail = true;
+	end
+	o.elapsed = o.elapsed * J;
 	if(e.speedy == true)then
 		o.elapsed = o.elapsed * 3;
 	end
@@ -3523,15 +3534,15 @@ local function Ne(o, n)
 			if(n.elapsed > n.life)then
 				n:SetAlpha(1 - ((n.elapsed - n.life) / .2));
 			end
-			n.x = n.x + n.xVel * J
-			n.y = n.y + n.yVel * J;
-			n.yVel = n.yVel + n.gravity * J;
+			n.x = n.x + n.xVel * J * o.tickScale
+			n.y = n.y + n.yVel * J * o.tickScale;
+			n.yVel = n.yVel + n.gravity * J * o.tickScale;
 			m = m + 1;
-			n.angle = n.angle + 10;
+			n.angle = n.angle + 10 * o.tickScale;
 			if(n.angle >= 360)then
 				n.angle = n.angle - 360;
 			end
-			o:RotateTexture(n, n.angle, .5, .5);
+			o:RotateTexture(n, math.floor(n.angle), .5, .5);
 			n:SetPoint("Center", r, "BottomLeft", n.x, n.y);
 		end
 	end
@@ -3539,7 +3550,10 @@ local function Ne(o, n)
 	local C;
 	for e = 1, #o.activePointTextStack do
 		n = o.activePointTextStack[A];
-		C = n:Update(o.elapsed);
+		-- Score popups animate in real time. In slow motion (end of level)
+		-- game time moves them only ~12 pixels a second, and text snaps to
+		-- whole pixels, which reads as a very low frame rate.
+		C = n:Update(o.tickScale / 30);
 		if(C)then
 			u(d.activePointTextStack, A);
 		else
@@ -3703,10 +3717,10 @@ local function Ne(o, n)
 			if(N ~= ht)then
 				local t;
 				for e = 1, ce do
-					getglobal("polyLine"..e):Hide();
+					_G["polyLine"..e]:Hide();
 				end
 				for e = 1, q do
-					getglobal("pathPiece"..e):Hide();
+					_G["pathPiece"..e]:Hide();
 				end
 				local r = 0;
 				n = St;
@@ -3859,13 +3873,19 @@ local function Ne(o, n)
 			end
 		else
 		end
-		while(ee <= o.elapsed)do
+		-- Fixed 10ms physics steps fed from an accumulator, so ball speed no
+		-- longer depends on the frame rate. The 1.2 factor matches what the
+		-- old loop produced at 30/60 fps (four steps per 33ms tick).
+		o.physicsTime = (o.physicsTime or 0) + o.elapsed * 1.2;
+		o.physicsSteps = math.floor(o.physicsTime / x);
+		o.physicsTime = o.physicsTime - o.physicsSteps * x;
+		while(ee < o.physicsSteps)do
 			A = 1;
 			for T = 1, #X do
 				n = X[A];
 				if(n.isBall)then
 					n.gravMultiplier = 1;
-					if(ee == 0)then
+					if(ee == 0)and(o.shiftTrail)then
 						if(n.trail1:IsShown())then
 							for e = 30, 2,  - 1 do
 								n["trail"..e].x = n["trail"..(e - 1)].x
@@ -4265,7 +4285,20 @@ local function Ne(o, n)
 			end
 			A = A + 1;
 		end
-		ee = ee + x;
+		ee = ee + 1;
+	end
+	-- Draw each ball ahead by the physics time not yet simulated, so it moves
+	-- every frame even when slow motion leaves several frames between steps.
+	if(o.physicsTime)and(o.physicsTime > 0)then
+		for e = 1, #X do
+			n = X[e];
+			if(n.isBall)and(n:IsShown())then
+				n:SetPoint("Center", r, "Bottomleft", n.x + n.xVel * o.physicsTime, n.y + n.yVel * o.physicsTime);
+			end
+		end
+	end
+	if(o.physicsSteps)and(o.physicsSteps > 0)then
+		o.shiftTrail = nil;
 	end
 	o.elapsed = 0;
 end
@@ -4756,7 +4789,7 @@ local function R(e)
 			Ge();
 		end
 		Q = false;
-		SetDesaturation(t.menuButton.background, true);
+		compat.SetDesaturation(t.menuButton.background, true);
 		t.menuButton:EnableMouse(false);
 	else
 		t.gameMenu:Hide();
@@ -4766,7 +4799,7 @@ local function R(e)
 		t.catagoryScreen:Hide();
 		t.charPortrait:Show();
 		Q = true;
-		SetDesaturation(t.menuButton.background, false);
+		compat.SetDesaturation(t.menuButton.background, false);
 		t.menuButton:EnableMouse(true);
 	end
 end
@@ -4858,9 +4891,9 @@ local function pe(c, m, x, d, l, S)
 	n[t[5]] = S;
 	n[t[6]] = true;
 	n[t[7]] = d;
-	local date=C_Calendar.GetDate()
+	local date=compat.GetDate()
 	local e, b, T, P = date.weekday, date.month, date.monthDay, date.year;
-	local f, S = GetGameTime();
+	local f, S = compat.GetGameTime();
 	Fe(c);
 	local a = #B;
 	local e = {};
@@ -4921,9 +4954,9 @@ local function ge(n)
 		local a = S(O(W(e, 10)));
 		local a = S(c(e, 11, 12));
 		local a = c(e, 69);
-		local date=C_Calendar.GetDate()
+		local date=compat.GetDate()
 		local e, e, e, e = date.weekday, date.month, date.monthDay, date.year;
-		local e, e = GetGameTime();
+		local e, e = compat.GetGameTime();
 		t[1] = n[o[4]];
 		t[2] = d;
 		t[3] = i;
@@ -4947,6 +4980,9 @@ local function ge(n)
 	return true;
 end
 local function X(n, n, e, ...)
+	if compat.IsSecret(e) then
+		return false
+	end
 	e = gsub(e, "%*", "");
 	local e = {strsplit(",", e)};
 	local n = t.catagoryScreen.frames[3].content2;
@@ -4961,6 +4997,9 @@ local function X(n, n, e, ...)
 	return true
 end
 local function M(n, a, t, ...)
+	if compat.IsSecret(t) then
+		return false
+	end
 	local t = string.match(t, e.filterText);
 	if(t)then
 		if(e.onlineList[t])then
@@ -5007,7 +5046,7 @@ local function le()
 	table.wipe(n);
 	table.wipe(e);
 	table.wipe(a);
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", M)
+	compat.AddMessageEventFilter("CHAT_MSG_SYSTEM", M)
 	local i, o, i, e, l;
 	local i = Y
 	for t = 1, #i do
@@ -5176,11 +5215,11 @@ end
 local function le()
 	local c = t.artBorder;
 	local s = e.artCut;
-	local d = CreateFrame("ScrollFrame", "", c);
+	local d = compat.CreateFrame("ScrollFrame", "", c);
 	d:SetWidth(64);
 	d:SetHeight(300);
 	d:SetPoint("BottomLeft", t.leftBorder, "BottomLeft",  - 8, 56);
-	local a = CreateFrame("Frame", "", t);
+	local a = compat.CreateFrame("Frame", "", t);
 	a:SetWidth(64);
 	a:SetHeight(300);
 	a:SetPoint("BottomLeft");
@@ -5343,7 +5382,7 @@ end
 local function re()
 	local d = t.artBorder;
 	local r = e.artCut;
-	local a = CreateFrame("Frame", "", d);
+	local a = compat.CreateFrame("Frame", "", d);
 	a:SetWidth(48);
 	a:SetHeight(300);
 	a:SetPoint("BottomRight", t.rightBorder3, "BottomRight",  - 8, 54);
@@ -5430,7 +5469,7 @@ local function re()
 	t.feverTracker = a;
 end
 local function he()
-	local n = CreateFrame("Frame", "", t.artBorder);
+	local n = compat.CreateFrame("Frame", "", t.artBorder);
 	n:SetPoint("Center", r, "Center", 0,  - 20)
 	n:SetWidth(380);
 	n:SetHeight(260);
@@ -5568,7 +5607,7 @@ local function he()
 	n:ClearAllPoints();
 	n:SetPoint("Bottom", 0, 16);
 	n:Show();
-	n = CreateFrame("Frame", "", S);
+	n = compat.CreateFrame("Frame", "", S);
 	n:SetPoint("Bottom", 0, 10)
 	n:SetWidth(340);
 	n:SetHeight(200);
@@ -5625,9 +5664,9 @@ local function he()
 			o = n.publishInfo
 		end
 		if(l > 0)then
-			SendChatMessage(o, "CHANNEL", nil, l);
+			compat.SendChatMessage(o, "CHANNEL", nil, l);
 		else
-			SendChatMessage(o, PeggleData.settings.defaultPublish);
+			compat.SendChatMessage(o, PeggleData.settings.defaultPublish);
 		end
 		n.bragScreen:Hide();
 		if not n.publishDuel then
@@ -5648,7 +5687,7 @@ local function he()
 	e:SetPoint("Bottomright",  - 16, 16);
 end
 local function ce()
-	local n = CreateFrame("Frame", "", t.artBorder);
+	local n = compat.CreateFrame("Frame", "", t.artBorder);
 	n:SetPoint("Center", r, "Center", 0,  - 20)
 	n:SetWidth(240);
 	n:SetHeight(214);
@@ -5668,10 +5707,10 @@ local function ce()
 	n:SetScript("OnShow", function(n)
 		d:Hide();
 		if(e[e.newInfo[13]])or(e.extraInfo)or((t.duelStatus == 3)and t.catagoryScreen.frames[2].player1.value == -1)then
-			SetDesaturation(n.restart.background, true);
+			compat.SetDesaturation(n.restart.background, true);
 			n.restart:EnableMouse(false);
 		else
-			SetDesaturation(n.restart.background, false);
+			compat.SetDesaturation(n.restart.background, false);
 			n.restart:EnableMouse(true);
 		end
 	end);
@@ -5713,7 +5752,7 @@ local function ce()
 	return l;
 end
 local function fe()
-	local n = CreateFrame("Frame", "", t.artBorder);
+	local n = compat.CreateFrame("Frame", "", t.artBorder);
 	n:SetPoint("Center", r, "Center", 0,  - 20)
 	n:SetWidth(340);
 	n:SetHeight(260);
@@ -5762,12 +5801,12 @@ local function fe()
 	local o = function(e)
 		e:SetBackdropBorderColor(.1, .6, .6);
 		e.hover = nil;
-		if not MouseIsOver(e:GetParent())then
+		if not compat.MouseIsOver(e:GetParent())then
 		e:GetParent():SetAlpha(.25);
 		end
 	end
 	l.edgeFile = e.artPath.."CharSelectBorder";
-	n = CreateFrame("Frame", "", a);
+	n = compat.CreateFrame("Frame", "", a);
 	n:SetPoint("Center",  - 80, 0)
 	n:SetWidth(140);
 	n:SetHeight(140);
@@ -5788,7 +5827,7 @@ local function fe()
 	n:SetScript("OnLeave", o);
 	n:SetID(me);
 	a.focus = n;
-	n = CreateFrame("Frame", "", a);
+	n = compat.CreateFrame("Frame", "", a);
 	n:SetPoint("Center", 80, 0)
 	n:SetWidth(140);
 	n:SetHeight(140);
@@ -5827,7 +5866,7 @@ local function fe()
 		n:onEnter();
 	end);
 	n:SetScript("OnLeave", function(e)
-		if not MouseIsOver(e:GetParent())then
+		if not compat.MouseIsOver(e:GetParent())then
 			e:GetParent():SetAlpha(.25);
 		end
 		n:onEnter();
@@ -5837,7 +5876,7 @@ local function fe()
 	return a;
 end
 local function me()
-	local n = CreateFrame("Frame", "", t.catagoryScreen);
+	local n = compat.CreateFrame("Frame", "", t.catagoryScreen);
 	n:SetPoint("TopLeft", 5,  - 9)
 	n:SetPoint("BottomRight",  - 4, 4);
 	local d = e.GetBackdrop();
@@ -5852,7 +5891,7 @@ local function me()
 	n:Hide();
 	n.showID = 1;
 	t.fontObj = CreateFont("PeggleDropdownFont");
-	t.fontObj:SetFont(e.artPath.."OVERLOAD.ttf", 16);
+	t.fontObj:SetFont(e.artPath.."OVERLOAD.ttf", 16, "");
 	t.fontObj.oldSetFont = t.fontObj.SetFont;
 	t.fontObj.oldGetFont = t.fontObj.GetFont;
 	t.fontObj.oldGetFontObject = t.fontObj.GetFontObject;
@@ -5908,7 +5947,7 @@ local function me()
 	local l = o:CreateCaption(0, 0, e.locale["QUICK_PLAY"], n, 25, .05, .66, 1, 1, nil)
 	l:ClearAllPoints();
 	l:SetPoint("Top", 0,  - 22);
-	local c = CreateFrame("Frame", "", a);
+	local c = compat.CreateFrame("Frame", "", a);
 	c:SetPoint("TopLeft")
 	c:SetPoint("BottomRight");
 	t.levelList = c;
@@ -5933,7 +5972,7 @@ local function me()
 	l = o:CreateCaption(0, 0, e.locale["SELECT_LEVEL"], c, 20, 1, .82, 0, 1, nil)
 	l:ClearAllPoints();
 	l:SetPoint("Top", c, "Topleft", 170,  -50);
-	local r = CreateFrame("Frame", "", c);
+	local r = compat.CreateFrame("Frame", "", c);
 	r:SetPoint("Topleft", 20,  -70)
 	r:SetPoint("Bottomleft", 20, 70);
 	r:SetWidth(300);
@@ -5985,7 +6024,7 @@ local function me()
 		t:SetPoint("Topright",  - 10,  - 9 - (a - 1) * 14);
 		t:SetTexture(e.artPath.."bannerSmallBlue");
 		c["flag"..a.."b"] = t;
-		n = CreateFrame("Frame", "", r);
+		n = compat.CreateFrame("Frame", "", r);
 		n:SetWidth(300 - 16);
 		n:SetHeight(16);
 		n:SetPoint("Topleft", 10, -8 - (a - 1) * 14);
@@ -6002,7 +6041,7 @@ local function me()
 		n:SetID(a);
 		c["highlight"..a] = n;
 	end
-	n = CreateFrame("Frame", "", a);
+	n = compat.CreateFrame("Frame", "", a);
 	n:SetPoint("Topright",  - 96 + 32 - 10 - 6,  - 64)
 	n:SetWidth(192 - 20 - 4);
 	n:SetHeight(192 - 20 - 4);
@@ -6015,7 +6054,7 @@ local function me()
 	t:SetWidth(192 - 14 - 20 - 4);
 	t:SetHeight(192 - 14 - 20 - 4);
 	a.levelImage = t;
-	n = CreateFrame("Frame", "", a);
+	n = compat.CreateFrame("Frame", "", a);
 	n:SetPoint("Topright",  - 34,  - 236)
 	n:SetWidth(256);
 	n:SetHeight(60);
@@ -6038,7 +6077,7 @@ local function me()
 	l:SetPoint("Center");
 	l:SetWidth(220);
 	a.beatLevel = l;
-	n = CreateFrame("Frame", "", a);
+	n = compat.CreateFrame("Frame", "", a);
 	n:SetPoint("Topright", a.bestFrame, "Bottomright", 0,  - 4)
 	n:SetWidth(256);
 	n:SetHeight(60);
@@ -6102,7 +6141,7 @@ local function me()
 	return a;
 end
 local function oe()
-	local n = CreateFrame("Frame", "", t.catagoryScreen);
+	local n = compat.CreateFrame("Frame", "", t.catagoryScreen);
 	n:SetPoint("TopLeft", 5,  - 9)
 	n:SetPoint("BottomRight",  - 4, 4);
 	local r = e.GetBackdrop();
@@ -6265,7 +6304,7 @@ local function oe()
 		end
 		o.winLossDuels:SetFormattedText(o.winLossDuels.caption1, a, i);
 	end
-	n = CreateFrame("Frame", "", a);
+	n = compat.CreateFrame("Frame", "", a);
 	n:SetPoint("Topright",  - 35,  - 200)
 	n:SetWidth(256);
 	n:SetHeight(128);
@@ -6274,7 +6313,7 @@ local function oe()
 	l:ClearAllPoints();
 	l:SetPoint("Top", a, "Top", 0,  - 22);
 	l:SetParent(n);
-	n = CreateFrame("Frame", "", a.duelInfo1);
+	n = compat.CreateFrame("Frame", "", a.duelInfo1);
 	n:SetPoint("Topright", a, "Topright",  - 98,  - 60)
 	n:SetWidth(128);
 	n:SetHeight(128);
@@ -6389,7 +6428,7 @@ local function oe()
 		local d = n.name2:GetText()or"";
 		if(d ~= "")then
 			o:Hide();
-			ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", M)
+			compat.AddMessageEventFilter("CHAT_MSG_SYSTEM", M)
 			t.levelList:Hide();
 			n.winLoss:ClearAllPoints();
 			n.winLoss:SetPoint("Topleft", n, "Bottomleft", 14, 190);
@@ -6583,7 +6622,7 @@ local function oe()
 	n:SetPoint("Bottom", a, "Bottom", 150, 16);
 	n:Hide();
 	a.decline2 = n;
-	n = CreateFrame("Frame", "", a);
+	n = compat.CreateFrame("Frame", "", a);
 	n:SetPoint("Topright",  - 35,  - 160)
 	n:SetWidth(256);
 	n:SetHeight(128);
@@ -6593,7 +6632,7 @@ local function oe()
 	l:ClearAllPoints();
 	l:SetPoint("Top", a, "Top", 0,  - 22);
 	l:SetParent(n);
-	n = CreateFrame("Frame", "", a.duelInfo2);
+	n = compat.CreateFrame("Frame", "", a.duelInfo2);
 	n:SetPoint("Topleft", a, "Topleft", 98,  - 60)
 	n:SetWidth(128);
 	n:SetHeight(128);
@@ -6628,7 +6667,7 @@ local function oe()
 	l:SetWidth(400);
 	l.caption1 = e.locale["DUEL_OPP_WL"]
 	a.winLossDuelsVs = l;
-	n = CreateFrame("Frame", "", a.duelInfo2);
+	n = compat.CreateFrame("Frame", "", a.duelInfo2);
 	n:SetPoint("Topleft", a, "Topleft", 10,  - 190)
 	n:SetPoint("Topright", a, "Topright",  - 10,  - 190)
 	n:SetHeight(88);
@@ -6651,7 +6690,7 @@ local function oe()
 	l:SetAllPoints(n);
 	l:SetJustifyV("MIDDLE")
 	a.player1.forfeit = l;
-	n = CreateFrame("Frame", "", n);
+	n = compat.CreateFrame("Frame", "", n);
 	n:SetAllPoints(a.player1);
 	a.player1.results = n;
 	n:Hide();
@@ -6690,7 +6729,7 @@ local function oe()
 	l = o:CreateCaption(64 + 32 + 8 + 64 + 300, 12 + 32 + 8, "", n, 18, .05, .66, 1, 1, nil)
 	l.caption1 = e.locale["DUEL_BREAKDOWN4"]
 	n.fever = l;
-	n = CreateFrame("Frame", "", a.duelInfo2);
+	n = compat.CreateFrame("Frame", "", a.duelInfo2);
 	n:SetPoint("Topleft", a, "Topleft", 10,  - 190 - 86)
 	n:SetPoint("Topright", a, "Topright",  - 10,  - 190 - 86)
 	n:SetHeight(88);
@@ -6713,7 +6752,7 @@ local function oe()
 	l:SetAllPoints(n);
 	l:SetJustifyV("MIDDLE")
 	a.player2.forfeit = l;
-	n = CreateFrame("Frame", "", n);
+	n = compat.CreateFrame("Frame", "", n);
 	n:SetAllPoints(a.player2);
 	a.player2.results = n;
 	n:Hide();
@@ -6781,7 +6820,7 @@ local function oe()
 	n:SetPoint("Bottomright", a, "Bottomright",  -16, 16);
 	n:Hide();
 	a.publish = n;
-	n = CreateFrame("Frame", "", UIParent);
+	n = compat.CreateFrame("Frame", "", UIParent);
 	n:SetWidth(10);
 	n:SetHeight(10);
 	n:SetPoint("Right");
@@ -6810,16 +6849,16 @@ local function oe()
 				e:Hide();
 				if(t.duelStatus == 3)then
 					if(de == false)and not t.catagoryScreen:IsShown()then
-						local e = getglobal("PeggleButton_menuAbandon");
+						local e = compat.getglobal("PeggleButton_menuAbandon");
 						e:GetScript("OnClick")(e);
 					end
 				end
 				if(t.duelStatus == 2)then
-					local e = getglobal("PeggleButton_duelDecline2");
+					local e = compat.getglobal("PeggleButton_duelDecline2");
 					if(e:IsVisible())then
 						e:GetScript("OnClick")(e);
 					else
-						e = getglobal("PeggleButton_duelDecline1");
+						e = compat.getglobal("PeggleButton_duelDecline1");
 						if(e:IsVisible())then
 							e:GetScript("OnClick")(e);
 						end
@@ -6848,7 +6887,7 @@ local function oe()
 	return a;
 end
 local function ee()
-	local l = CreateFrame("Frame", "", t.catagoryScreen);
+	local l = compat.CreateFrame("Frame", "", t.catagoryScreen);
 	l:SetPoint("TopLeft", 5,  - 9)
 	l:SetPoint("BottomRight",  - 4, 4);
 	local d = e.GetBackdrop();
@@ -6867,7 +6906,7 @@ local function ee()
 		e.content1:Hide();
 		e.content1:Show();
 	end);
-	local a = CreateFrame("Frame", "", p);
+	local a = compat.CreateFrame("Frame", "", p);
 	a:SetPoint("TopLeft")
 	a:SetPoint("BottomRight");
 	p.content1 = a;
@@ -6923,10 +6962,10 @@ local function ee()
 				n.listSlider:SetValue(F(0, #i - 13));
 			end
 			if(e.cCount > 4)then
-				SetDesaturation(n.newChallenge.background, true);
+				compat.SetDesaturation(n.newChallenge.background, true);
 				n.newChallenge:EnableMouse(false);
 			else
-				SetDesaturation(n.newChallenge.background, false);
+				compat.SetDesaturation(n.newChallenge.background, false);
 				n.newChallenge:EnableMouse(true);
 			end
 			local d = n.listSlider:GetValue();
@@ -7059,12 +7098,12 @@ local function ee()
 			if(l.removed == true)then
 				n.stageDetails2a:SetText(e.locale["_EXPIRED"]);
 				n.stageDetails2a:SetTextColor(.5, .5, .5);
-				SetDesaturation(n.startChallenge1.background, true);
+				compat.SetDesaturation(n.startChallenge1.background, true);
 				n.startChallenge1:EnableMouse(false);
 			elseif(l.ended == true)then
 				n.stageDetails2a:SetFormattedText("%dh %dm", o.TimeBreakdown(l.elapsed));
 				n.stageDetails2a:SetTextColor(.5, .5, .5);
-				SetDesaturation(n.startChallenge1.background, true);
+				compat.SetDesaturation(n.startChallenge1.background, true);
 				n.startChallenge1:EnableMouse(false);
 			else
 				hours, minutes = o.TimeBreakdown(l.elapsed);
@@ -7076,7 +7115,7 @@ local function ee()
 				else
 					n.stageDetails2a:SetTextColor(0, 1, 0);
 				end
-				SetDesaturation(n.startChallenge1.background, false);
+				compat.SetDesaturation(n.startChallenge1.background, false);
 				n.startChallenge1:EnableMouse(true);
 			end
 			n.stageDetails3a:SetText(a[4])
@@ -7108,11 +7147,11 @@ local function ee()
 			t = l - t;
 			if(r == -1)then
 				n.stageDetails6a:SetText(n.stageDetails6a.caption1);
-				SetDesaturation(n.startChallenge1.background, false);
+				compat.SetDesaturation(n.startChallenge1.background, false);
 				n.startChallenge1:EnableMouse(true);
 			else
 				n.stageDetails6a:SetFormattedText(n.stageDetails6a.caption2, t, l);
-				SetDesaturation(n.startChallenge1.background, true);
+				compat.SetDesaturation(n.startChallenge1.background, true);
 				n.startChallenge1:EnableMouse(false);
 			end
 		end
@@ -7123,7 +7162,7 @@ local function ee()
 	n.caption1 = n:GetText();
 	n.caption2 = e.locale["CHALLENGE_DETAILS"];
 	a.title = n;
-	local i = CreateFrame("Frame", "", a);
+	local i = compat.CreateFrame("Frame", "", a);
 	i:SetPoint("Topleft", 10,  - 58)
 	i:SetPoint("Bottomleft", 10, 10);
 	i:SetWidth(200);
@@ -7133,7 +7172,7 @@ local function ee()
 	i:SetBackdrop(d);
 	i:SetBackdropColor(.4, .4, .4, 1);
 	i:SetBackdropBorderColor(1, 1, 1);
-	i = CreateFrame("Frame", "", i);
+	i = compat.CreateFrame("Frame", "", i);
 	i:SetPoint("Topleft", 6,  - 30)
 	i:SetPoint("Bottomright",  - 6, 6 + 66);
 	d.bgFile = e.artPath.."windowBackground";
@@ -7142,7 +7181,7 @@ local function ee()
 	i:SetBackdrop(d);
 	i:SetBackdropColor(.2, .2, .2, 1);
 	i:SetBackdropBorderColor(1, 1, 1);
-	local r = CreateFrame("Slider", "Peggle_challengeListSlider", i, "UIPanelScrollBarTemplate");
+	local r = compat.CreateFrame("Slider", "Peggle_challengeListSlider", i, "UIPanelScrollBarTemplate");
 	r:SetPoint("TopRight", i, "TopRight",  - 6,  - 21);
 	r:SetPoint("BottomRight", i, "BottomRight",  - 6, 23);
 	r:SetValueStep(1);
@@ -7155,11 +7194,11 @@ local function ee()
 	r.background = r:CreateTexture(nil, "background");
 	r.background:SetPoint("TopLeft")
 	r.background:SetPoint("BottomRight",  - 1, 0)
-	r.background:SetTexture(0, 0, 0, .35);
-	getglobal(r:GetName().."ScrollUpButton"):SetScript("OnClick", function(e)
+	r.background:SetColorTexture(0, 0, 0, .35);
+	compat.Child(r, "ScrollUpButton"):SetScript("OnClick", function(e)
 		e:GetParent():SetValue(e:GetParent():GetValue() - 1);
 	end);
-	getglobal(r:GetName().."ScrollDownButton"):SetScript("OnClick", function(e)
+	compat.Child(r, "ScrollDownButton"):SetScript("OnClick", function(e)
 		e:GetParent():SetValue(e:GetParent():GetValue() + 1);
 	end);
 	a.listSlider = r;
@@ -7240,7 +7279,7 @@ local function ee()
 		h:SetTexture(e.artPath.."checkmark");
 		a["info"..t.."Played"] = h;
 		h:Hide();
-		l = CreateFrame("Frame", "", i);
+		l = compat.CreateFrame("Frame", "", i);
 		l:SetWidth(156);
 		l:SetHeight(20);
 		l:SetPoint("Topleft", 10,  - 8 - (t - 1) * 20);
@@ -7281,7 +7320,7 @@ local function ee()
 	n:ClearAllPoints();
 	n:SetPoint("Bottom", i:GetParent(), "Bottom", 0, 10);
 	n:SetWidth(180);
-	i = CreateFrame("Frame", "", a);
+	i = compat.CreateFrame("Frame", "", a);
 	i:SetPoint("Topleft", 10 + 200,  - 58)
 	i:SetPoint("Bottomright",  - 10, 10);
 	i:SetWidth(200);
@@ -7330,7 +7369,7 @@ local function ee()
 	n:SetText("");
 	n = o:CreateCaption(12, r, "", i, 12, 1, 1, 1, nil, nil)
 	a.stageDetails5a = n;
-	l = CreateFrame("Frame", "", i);
+	l = compat.CreateFrame("Frame", "", i);
 	l:SetPoint("Topleft", 10,  - r)
 	l:SetWidth(128)
 	l:SetHeight(128)
@@ -7385,7 +7424,7 @@ local function ee()
 	l:ClearAllPoints();
 	l:SetPoint("Bottom", 75, 21);
 	a.backChallenge = l;
-	i = CreateFrame("Frame", "", i);
+	i = compat.CreateFrame("Frame", "", i);
 	i:SetPoint("Topright",  - 6,  - 30)
 	i:SetPoint("Bottomright",  - 6, 6 + 66);
 	i:SetWidth(270);
@@ -7401,7 +7440,7 @@ local function ee()
 		a = t.catagoryScreen.frames[3].content1;
 		a.nameListSlider:SetValue(a.nameListSlider:GetValue() - (e * 3));
 	end);
-	local r = CreateFrame("Slider", "Peggle_challengeNameListSlider", i, "UIPanelScrollBarTemplate");
+	local r = compat.CreateFrame("Slider", "Peggle_challengeNameListSlider", i, "UIPanelScrollBarTemplate");
 	r:SetPoint("TopRight", i, "TopRight",  - 6,  - 21);
 	r:SetPoint("BottomRight", i, "BottomRight",  - 6, 23);
 	r:SetValueStep(1);
@@ -7414,11 +7453,11 @@ local function ee()
 	r.background = r:CreateTexture(nil, "background");
 	r.background:SetPoint("TopLeft")
 	r.background:SetPoint("BottomRight",  - 1, 0)
-	r.background:SetTexture(0, 0, 0, .35);
-	getglobal(r:GetName().."ScrollUpButton"):SetScript("OnClick", function(e)
+	r.background:SetColorTexture(0, 0, 0, .35);
+	compat.Child(r, "ScrollUpButton"):SetScript("OnClick", function(e)
 		e:GetParent():SetValue(e:GetParent():GetValue() - 1);
 	end);
-	getglobal(r:GetName().."ScrollDownButton"):SetScript("OnClick", function(e)
+	compat.Child(r, "ScrollDownButton"):SetScript("OnClick", function(e)
 		e:GetParent():SetValue(e:GetParent():GetValue() + 1);
 	end);
 	a.nameListSlider = r;
@@ -7473,7 +7512,7 @@ local function ee()
 		a["infoName"..t.."c1"] = n;
 	end
 	a:Show();
-	a = CreateFrame("Frame", "", p);
+	a = compat.CreateFrame("Frame", "", p);
 	a:SetPoint("TopLeft")
 	a:SetPoint("BottomRight");
 	a:Hide();
@@ -7507,11 +7546,11 @@ local function ee()
 	n:SetWidth(350);
 	l = x(14, 342, e.locale["CHALLENGE_VIEW_OFFLINE"], "guildViewOnline", true, a, function(e)
 	if(e:GetChecked())then
-		SetGuildRosterShowOffline(true);
+		compat.SetGuildRosterShowOffline(true);
 	else
-		SetGuildRosterShowOffline(false);
+		compat.SetGuildRosterShowOffline(false);
 	end
-	a.nameSlider:SetMinMaxValues(0, F(0, GetNumGuildMembers() - 15));
+	a.nameSlider:SetMinMaxValues(0, F(0, compat.GetNumGuildMembers() - 15));
 	local e = t.catagoryScreen.frames[3].content2;
 	if(e.nameSlider:GetValue() == 0)then
 		e.nameSlider:GetScript("OnValueChanged")(e.nameSlider);
@@ -7525,11 +7564,11 @@ local function ee()
 	a.guildOption1 = l;
 	l = x(14, 362, e.locale["CHALLENGE_SORT_ONLINE"], "guildSortOnline", true, a, function(e)
 		if(e:GetChecked())then
-			SortGuildRoster("online");
+			compat.SortGuildRoster("online");
 		else
-			SortGuildRoster("name");
+			compat.SortGuildRoster("name");
 		end
-		a.nameSlider:SetMinMaxValues(0, F(0, GetNumGuildMembers() - 15));
+		a.nameSlider:SetMinMaxValues(0, F(0, compat.GetNumGuildMembers() - 15));
 		local e = t.catagoryScreen.frames[3].content2;
 		if(e.nameSlider:GetValue() == 0)then
 			e.nameSlider:GetScript("OnValueChanged")(e.nameSlider);
@@ -7544,20 +7583,20 @@ local function ee()
 		local e = t.catagoryScreen.frames[3].content2;
 		if(e.setSrc ~= n:GetID())then
 			e.setSrc = n:GetID();
-			getglobal("PeggleCheckbox_inviteSrc1"):SetChecked(false);
-			getglobal("PeggleCheckbox_inviteSrc2"):SetChecked(false);
-			getglobal("PeggleCheckbox_inviteSrc3"):SetChecked(false);
+			compat.getglobal("PeggleCheckbox_inviteSrc1"):SetChecked(false);
+			compat.getglobal("PeggleCheckbox_inviteSrc2"):SetChecked(false);
+			compat.getglobal("PeggleCheckbox_inviteSrc3"):SetChecked(false);
 			e.customText:Hide();
 			e.guildOption1:Hide();
 			e.guildOption2:Hide();
 			if(e.setSrc == 1)then
-				e.nameSlider:SetMinMaxValues(0, F(0, GetNumFriends() - 15));
+				e.nameSlider:SetMinMaxValues(0, F(0, compat.GetNumFriends() - 15));
 			elseif(e.setSrc == 2)then
-				local t = GetNumGuildMembers();
+				local t = compat.GetNumGuildMembers();
 				e.nameSlider:SetMinMaxValues(0, F(0, t - 15));
 				if(t > 0)then
-					if((GetGuildRosterInfo(1)) > (GetGuildRosterInfo(t)))then
-						SortGuildRoster("name");
+					if((compat.GetGuildRosterInfo(1)) > (compat.GetGuildRosterInfo(t)))then
+						compat.SortGuildRoster("name");
 					end
 				end
 				e.guildOption1:Show();
@@ -7595,11 +7634,11 @@ local function ee()
 		local e = t.catagoryScreen.frames[3].content2;
 		local o, n;
 		if(e.setSrc == 1)then
-			o = GetFriendInfo;
-			n = GetNumFriends();
+			o = compat.GetFriendInfo;
+			n = compat.GetNumFriends();
 		elseif(e.setSrc == 2)then
-			o = GetGuildRosterInfo;
-			n = GetNumGuildMembers();
+			o = compat.GetGuildRosterInfo;
+			n = compat.GetNumGuildMembers();
 		else
 			o = e.getChannels;
 			n = #e.channelNames;
@@ -7656,14 +7695,14 @@ local function ee()
 	n:SetWidth(150);
 	n.caption = e.locale["INVITED"];
 	a.invitedCount = n;
-	i = CreateFrame("Frame", "", a);
+	i = compat.CreateFrame("Frame", "", a);
 	i:SetPoint("Topleft", 10,  - 135)
 	i:SetWidth(160);
 	i:SetHeight(204);
 	i:SetBackdrop(d);
 	i:SetBackdropColor(0, 0, 0, 0);
 	i:SetBackdropBorderColor(1, 1, 1);
-	r = CreateFrame("Slider", "Peggle_challengeNameSlider", i, "UIPanelScrollBarTemplate");
+	r = compat.CreateFrame("Slider", "Peggle_challengeNameSlider", i, "UIPanelScrollBarTemplate");
 	r:SetPoint("TopRight", i, "TopRight",  - 6,  - 21);
 	r:SetPoint("BottomRight", i, "BottomRight",  - 6, 23);
 	r:SetValueStep(1);
@@ -7672,9 +7711,9 @@ local function ee()
 	r.background = r:CreateTexture(nil, "background");
 	r.background:SetPoint("TopLeft")
 	r.background:SetPoint("BottomRight",  - 1, 0)
-	r.background:SetTexture(0, 0, 0, .35);
-	getglobal(r:GetName().."ScrollUpButton"):SetScript("OnClick", getglobal("Peggle_challengeNameListSliderScrollUpButton"):GetScript("OnClick"));
-	getglobal(r:GetName().."ScrollDownButton"):SetScript("OnClick", getglobal("Peggle_challengeNameListSliderScrollDownButton"):GetScript("OnClick"));
+	r.background:SetColorTexture(0, 0, 0, .35);
+	compat.Child(r, "ScrollUpButton"):SetScript("OnClick", compat.Child(compat.getglobal("Peggle_challengeNameListSlider"), "ScrollUpButton"):GetScript("OnClick"));
+	compat.Child(r, "ScrollDownButton"):SetScript("OnClick", compat.Child(compat.getglobal("Peggle_challengeNameListSlider"), "ScrollDownButton"):GetScript("OnClick"));
 	a.nameSlider = r;
 	local E = function(e)
 		local t = t.catagoryScreen.frames[3].content2["listItemA"..e:GetID()]:GetText();
@@ -7731,7 +7770,7 @@ local function ee()
 		n:SetHeight(12);
 		n:SetJustifyH("LEFT");
 		a["listItemA"..e] = n;
-		l = CreateFrame("Frame", "", i);
+		l = compat.CreateFrame("Frame", "", i);
 		l:SetWidth(126);
 		l:SetHeight(12);
 		l:SetPoint("Topleft", 10,  - 11 - (e - 1) * 12);
@@ -7741,20 +7780,20 @@ local function ee()
 		l:SetScript("OnMouseWheel", b);
 		l.tex = i:CreateTexture(nil, "Artwork");
 		l.tex:SetAllPoints(l);
-		l.tex:SetTexture(1, 1, 0);
+		l.tex:SetColorTexture(1, 1, 0);
 		l.tex:SetAlpha(0);
 		l:EnableMouse(true);
 		l:EnableMouseWheel(true);
 		l:SetID(e);
 	end
-	i = CreateFrame("Frame", "", a);
+	i = compat.CreateFrame("Frame", "", a);
 	i:SetPoint("Topleft", 200,  - 135)
 	i:SetWidth(160);
 	i:SetHeight(204);
 	i:SetBackdrop(d);
 	i:SetBackdropColor(0, 0, 0, 0);
 	i:SetBackdropBorderColor(1, 1, 1);
-	r = CreateFrame("Slider", "Peggle_invitedNameSlider", i, "UIPanelScrollBarTemplate");
+	r = compat.CreateFrame("Slider", "Peggle_invitedNameSlider", i, "UIPanelScrollBarTemplate");
 	r:SetPoint("TopRight", i, "TopRight",  - 6,  - 21);
 	r:SetPoint("BottomRight", i, "BottomRight",  - 6, 23);
 	r:SetValueStep(1);
@@ -7763,9 +7802,9 @@ local function ee()
 	r.background = r:CreateTexture(nil, "background");
 	r.background:SetPoint("TopLeft")
 	r.background:SetPoint("BottomRight",  - 1, 0)
-	r.background:SetTexture(0, 0, 0, .35);
-	getglobal(r:GetName().."ScrollUpButton"):SetScript("OnClick", getglobal("Peggle_challengeNameListSliderScrollUpButton"):GetScript("OnClick"));
-	getglobal(r:GetName().."ScrollDownButton"):SetScript("OnClick", getglobal("Peggle_challengeNameListSliderScrollDownButton"):GetScript("OnClick"));
+	r.background:SetColorTexture(0, 0, 0, .35);
+	compat.Child(r, "ScrollUpButton"):SetScript("OnClick", compat.Child(compat.getglobal("Peggle_challengeNameListSlider"), "ScrollUpButton"):GetScript("OnClick"));
+	compat.Child(r, "ScrollDownButton"):SetScript("OnClick", compat.Child(compat.getglobal("Peggle_challengeNameListSlider"), "ScrollDownButton"):GetScript("OnClick"));
 	a.inviteSlider = r;
 	for e = 1, 15 do
 		n = o:CreateCaption(14, 10 + (e - 1) * 12, "NameGoesHere", i, 10, 1, 1, 1, nil, "")
@@ -7773,7 +7812,7 @@ local function ee()
 		n:SetHeight(12);
 		n:SetJustifyH("LEFT");
 		a["listItemB"..e] = n;
-		l = CreateFrame("Frame", "", i);
+		l = compat.CreateFrame("Frame", "", i);
 		l:SetWidth(126);
 		l:SetHeight(12);
 		l:SetPoint("Topleft", 10,  - 11 - (e - 1) * 12);
@@ -7783,13 +7822,13 @@ local function ee()
 		l:SetScript("OnMouseWheel", T);
 		l.tex = i:CreateTexture(nil, "Artwork");
 		l.tex:SetAllPoints(l);
-		l.tex:SetTexture(1, 1, 0);
+		l.tex:SetColorTexture(1, 1, 0);
 		l.tex:SetAlpha(0);
 		l:EnableMouse(true);
 		l:EnableMouseWheel(true);
 		l:SetID(e);
 	end
-	l = CreateFrame("Frame", "", a);
+	l = compat.CreateFrame("Frame", "", a);
 	l:SetPoint("Topleft", 340 + 16 + 32 - 32 + 16,  - 46)
 	l:SetWidth(192 + 32)
 	l:SetHeight(192 + 32)
@@ -7803,8 +7842,8 @@ local function ee()
 	h:SetHeight(192 + 32 - 14)
 	a.levelImage = h;
 	l = We(357, 16, 256 - 16, "challengeLevels", nil, nil, a, a.levelImage, nil)
-	getglobal(l:GetName().."Text"):ClearAllPoints();
-	getglobal(l:GetName().."Text"):SetPoint("Center", a, "Topleft", 360 + (256 - 16) / 2,  - 16 - 13);
+	compat.Child(l, "Text"):ClearAllPoints();
+	compat.Child(l, "Text"):SetPoint("Center", a, "Topleft", 360 + (256 - 16) / 2,  - 16 - 13);
 	a.info = l;
 	l = o:CreateSlider(383,  - (256 + 32), 200, e.locale["CHALLENGE_SHOTS"], "challengeNumShots", a, 1, 10, 1, nil, nil, nil, nil, nil, nil, true);
 	a.shots = l;
@@ -7812,9 +7851,9 @@ local function ee()
 		local t = e:GetParent();
 		if(t.setDur ~= e:GetID())then
 			t.setDur = e:GetID();
-			getglobal("PeggleCheckbox_duration1"):SetChecked(false);
-			getglobal("PeggleCheckbox_duration2"):SetChecked(false);
-			getglobal("PeggleCheckbox_duration3"):SetChecked(false);
+			compat.getglobal("PeggleCheckbox_duration1"):SetChecked(false);
+			compat.getglobal("PeggleCheckbox_duration2"):SetChecked(false);
+			compat.getglobal("PeggleCheckbox_duration3"):SetChecked(false);
 		end
 		e:SetChecked(true);
 	end
@@ -7853,7 +7892,7 @@ local function ee()
 			end
 		end
 		if(#n.grabNames > 0)then
-			ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL_LIST", X);
+			compat.AddMessageEventFilter("CHAT_MSG_CHANNEL_LIST", X);
 			n.nameGrabber.elapsed = -1;
 			n.nameGrabber:Show();
 			return;
@@ -7869,7 +7908,7 @@ local function ee()
 		end
 		local a = pe(a, d, i, r, l, o)
 		s(Y, a);
-		ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", M)
+		compat.AddMessageEventFilter("CHAT_MSG_SYSTEM", M)
 		a.serverName = e.name;
 		local o = t.network.server;
 		a[e.newInfo[14]] = true;
@@ -7893,12 +7932,12 @@ local function ee()
 		e.content2:Hide();
 		e.content1:Hide();
 		e.content1:Show();
-		getglobal("PeggleButton_startChallengeButton1"):GetScript("OnClick")();
+		compat.getglobal("PeggleButton_startChallengeButton1"):GetScript("OnClick")();
 	end)
 	l:ClearAllPoints();
 	l:SetPoint("Center", 166,  - 188);
 	a.newChallenge = l;
-	l = CreateFrame("Frame", "", t);
+	l = compat.CreateFrame("Frame", "", t);
 	l:SetAllPoints(t);
 	l:EnableMouse(true);
 	l:SetFrameLevel(l:GetFrameLevel() + 70);
@@ -7916,13 +7955,13 @@ local function ee()
 				e.elapsed = -1;
 			else
 				e:Hide();
-				ChatFrame_RemoveMessageEventFilter("CHAT_MSG_CHANNEL_LIST", X);
+				compat.RemoveMessageEventFilter("CHAT_MSG_CHANNEL_LIST", X);
 				e.content.newChallenge:GetScript("OnClick")(e.content.newChallenge);
 			end
 		end
 	end);
 	a.nameGrabber = l;
-	l = CreateFrame("Frame", "", a.nameGrabber);
+	l = compat.CreateFrame("Frame", "", a.nameGrabber);
 	l:SetPoint("Center")
 	l:SetWidth(560);
 	l:SetHeight(64);
@@ -7935,7 +7974,7 @@ local function ee()
 	n = o:CreateCaption(0, 0, e.locale["GENERATING_NAMES"], l, 25, 1, .82, 0, 1, nil)
 	n:ClearAllPoints();
 	n:SetPoint("Center");
-	l = CreateFrame("Frame", "", UIParent);
+	l = compat.CreateFrame("Frame", "", UIParent);
 	l:SetWidth(1);
 	l:SetHeight(1);
 	l:SetPoint("top");
@@ -8024,7 +8063,7 @@ local function ee()
 	return p;
 end
 local function G()
-	local l = CreateFrame("Frame", "", t.catagoryScreen);
+	local l = compat.CreateFrame("Frame", "", t.catagoryScreen);
 	l:SetPoint("TopLeft", 297,  - 9)
 	l:SetPoint("BottomRight",  - 4, 4);
 	local d = e.GetBackdrop();
@@ -8045,7 +8084,7 @@ local function G()
 	n:ClearAllPoints();
 	n:SetPoint("Top", 0,  - 62);
 	n:SetWidth(l:GetWidth() - 20);
-	local a = CreateFrame("Frame", "", l);
+	local a = compat.CreateFrame("Frame", "", l);
 	a:SetPoint("Top", 0,  - 114)
 	a:SetWidth(l:GetWidth() - 40);
 	a:SetHeight(230);
@@ -8105,7 +8144,7 @@ local function G()
 	end)
 	l:ClearAllPoints();
 	l:SetPoint("Bottom", 0, 18);
-	local n = CreateFrame("Frame", "", r);
+	local n = compat.CreateFrame("Frame", "", r);
 	n:SetPoint("Topright", r, "Topleft", 8, 0)
 	n:SetPoint("Bottomright", r, "Bottomleft", 8, 0)
 	n:SetWidth(300);
@@ -8181,23 +8220,19 @@ local function G()
 	end
 	i = e.talentTex;
 	local e = function(d, a, n, t, c, r, o, l)
-		local t = CreateFrame("Button", "PeggleTalent"..n, t, "ActionButtonTemplate");
+		local t = compat.CreateTalentButton("PeggleTalent"..n, t);
 		t:SetPoint("Topleft", d, a);
 		t:SetID(n);
-		t:GetNormalTexture():SetTexture(0, 0, 0, 0);
-		t.rank = _G[t:GetName().."Count"];
-		t.border = _G[t:GetName().."Border"];
-		t.icon = _G[t:GetName().."Icon"];
 		t.icon:SetTexture(e.artPath..i[n]);
 		t:SetScript("OnClick", xt);
 		t:SetScript("OnEnter", c);
 		t:SetScript("OnLeave", r);
 		if(o)then
-			t.arrow = t:CreateTexture(nil, "Background", "TalentBranchTemplate");
+			t.arrow = compat.CreateTalentTexture(t, "Background", "branch");
 			t.arrow:SetTexCoord(unpack(TALENT_BRANCH_TEXTURECOORDS.down[ - 1]));
 			t.arrow:SetPoint("Topleft", t, "Bottomleft", 2,  - 1);
 		elseif(l)then
-			t.arrow = t:CreateTexture(nil, "Overlay", "TalentArrowTemplate");
+			t.arrow = compat.CreateTalentTexture(t, "Overlay", "arrow");
 			t.arrow:SetTexCoord(unpack(TALENT_ARROW_TEXTURECOORDS.top[ - 1]));
 			t.arrow:SetPoint("Topleft", 2, 17);
 		end
@@ -8221,7 +8256,7 @@ local function G()
 	return r;
 end
 local function w()
-	local n = CreateFrame("Frame", "", t.catagoryScreen);
+	local n = compat.CreateFrame("Frame", "", t.catagoryScreen);
 	n:SetPoint("TopLeft", 5,  - 9)
 	n:SetPoint("BottomRight",  - 4, 4);
 	local l = e.GetBackdrop();
@@ -8250,7 +8285,7 @@ local function w()
 			end
 		end
 	end
-	local r = CreateFrame("Frame", "", a);
+	local r = compat.CreateFrame("Frame", "", a);
 	r:SetPoint("Topleft", 10,  - 10)
 	r:SetPoint("Bottomleft", 10, 10);
 	r:SetWidth(180);
@@ -8284,7 +8319,7 @@ local function w()
 		text:SetWidth(180 - 16);
 		text:SetHeight(14);
 		text:SetJustifyH("LEFT")
-		n = CreateFrame("Frame", "", r);
+		n = compat.CreateFrame("Frame", "", r);
 		n:SetWidth(180 - 16);
 		n:SetHeight(20);
 		n:SetPoint("Topleft", 10,  - 6 - (t - 1) * 20);
@@ -8301,7 +8336,7 @@ local function w()
 		n:SetID(t);
 		a["highlight"..t] = n;
 	end
-	local t = CreateFrame("Frame", "", a);
+	local t = compat.CreateFrame("Frame", "", a);
 	t:SetPoint("Topleft", r, "Topright");
 	t:SetPoint("Bottomright",  - 10, 10);
 	t:Hide();
@@ -8337,7 +8372,7 @@ local function w()
 	n:SetPoint("Bottomright",  - 10, 20);
 	n:SetTexture(e.artPath.."howtoplay");
 	n:SetTexCoord(unpack(l));
-	t = CreateFrame("Frame", "", a);
+	t = compat.CreateFrame("Frame", "", a);
 	t:SetPoint("Topleft", r, "Topright");
 	t:SetPoint("Bottomright",  - 10, 10);
 	t:Hide();
@@ -8367,7 +8402,7 @@ local function w()
 	n:SetPoint("Top", text, "Bottom", 0,  - 10);
 	n:SetTexture(e.artPath.."howtoplay");
 	n:SetTexCoord(unpack(l));
-	t = CreateFrame("Frame", "", a);
+	t = compat.CreateFrame("Frame", "", a);
 	t:SetPoint("Topleft", r, "Topright");
 	t:SetPoint("Bottomright",  - 10, 10);
 	t:Hide();
@@ -8390,7 +8425,7 @@ local function w()
 	text:SetWidth(t:GetWidth() - 20);
 	text:ClearAllPoints();
 	text:SetPoint("Top", n, "Bottom", 0,  - 10);
-	t = CreateFrame("Frame", "", a);
+	t = compat.CreateFrame("Frame", "", a);
 	t:SetPoint("Topleft", r, "Topright");
 	t:SetPoint("Bottomright",  - 10, 10);
 	t:Hide();
@@ -8416,7 +8451,7 @@ local function w()
 	return a;
 end
 local function _()
-	local n = CreateFrame("Frame", "", t.catagoryScreen);
+	local n = compat.CreateFrame("Frame", "", t.catagoryScreen);
 	n:SetPoint("TopLeft", 5,  - 9)
 	n:SetPoint("BottomRight",  - 4, 4);
 	local S = e.GetBackdrop();
@@ -8469,12 +8504,12 @@ local function _()
 	local c = function(t)
 		local n = PeggleData.settings.soundVolume;
 		PeggleData.settings.soundVolume = t:GetID();
-		getglobal("PeggleCheckbox_soundVolume1"):SetChecked(false);
-		getglobal("PeggleCheckbox_soundVolume2"):SetChecked(false);
-		getglobal("PeggleCheckbox_soundVolume3"):SetChecked(false);
+		compat.getglobal("PeggleCheckbox_soundVolume1"):SetChecked(false);
+		compat.getglobal("PeggleCheckbox_soundVolume2"):SetChecked(false);
+		compat.getglobal("PeggleCheckbox_soundVolume3"):SetChecked(false);
 		t:SetChecked(true);
 		t.updating = true;
-		local e = getglobal("PeggleButton_soundButton");
+		local e = compat.getglobal("PeggleButton_soundButton");
 		if not e.updating then
 			if(e.off == 1)and(t:GetID() ~= 2)then
 				e.hover = true;
@@ -8508,7 +8543,7 @@ local function _()
 		n:SetChecked(true);
 	end
 	if(PeggleData.settings.soundVolume == 2)then
-		local e = getglobal("PeggleButton_soundButton");
+		local e = compat.getglobal("PeggleButton_soundButton");
 		e.hover = true;
 		e:GetScript("OnClick")(e);
 	end
@@ -8527,7 +8562,7 @@ local function _()
 		t.catagoryScreen.frames[6]:Hide();
 		t.credits:Show();
 	end, nil, true);
-	local l = CreateFrame("Frame", "", t.catagoryScreen);
+	local l = compat.CreateFrame("Frame", "", t.catagoryScreen);
 	l:SetPoint("TopLeft", 5,  - 9)
 	l:SetPoint("BottomRight",  - 4, 4);
 	l:SetBackdrop(S);
@@ -8570,7 +8605,7 @@ local function _()
 	--Start Credits Screen
 	n:ClearAllPoints();
 	n:SetPoint("Bottom", 0, 30);
-	l = CreateFrame("Frame", "", t.catagoryScreen);
+	l = compat.CreateFrame("Frame", "", t.catagoryScreen);
 	l:SetPoint("TopLeft", 5,  - 9)
 	l:SetPoint("BottomRight",  - 4, 4);
 	l:SetBackdrop(S);
@@ -8683,11 +8718,11 @@ local function _()
 	return d;
 end
 local function K()
-	local n = CreateFrame("Frame", "", t);
+	local n = compat.CreateFrame("Frame", "", t);
 	n:SetPoint("TopLeft", 8,  - 80)
 	n:SetWidth(t:GetWidth() - 16 - 2);
 	n:SetHeight(t:GetHeight() - 80 - 6 - 2);
-	local l = CreateFrame("Frame", "", n);
+	local l = compat.CreateFrame("Frame", "", n);
 	l:SetFrameLevel(l:GetFrameLevel() + 4);
 	l:SetWidth(20);
 	l:SetHeight(20);
@@ -8711,7 +8746,7 @@ local function K()
 	t.catagoryScreen = n;
 	n.frames = {};
 	n:Hide();
-	n = CreateFrame("Frame", "", t.catagoryScreen);
+	n = compat.CreateFrame("Frame", "", t.catagoryScreen);
 	n:SetWidth(653)
 	n:SetHeight(64);
 	n:SetPoint("Topleft",  - 4, 54);
@@ -8732,7 +8767,7 @@ local function K()
 	t.sparks = l.sparks;
 	l, a = De(a, 0, n, w(), "tabHowToPlay", true);
 	t.catagoryScreen.tabFrame.currentX = a;
-	n = CreateFrame("Frame", "", t.catagoryScreen);
+	n = compat.CreateFrame("Frame", "", t.catagoryScreen);
 	n:SetPoint("TopLeft", 5,  - 9)
 	n:SetPoint("BottomRight",  - 4, 4);
 	n:SetFrameLevel(n:GetFrameLevel() + 10);
@@ -8876,7 +8911,7 @@ local function w(n, l, ...)
 		t.minimap:Hide();
 	end
 	if(PeggleData.settings.minimapDetached == nil)then
-		t.minimap:SetPoint("Center", Minimap, "Center",  - (76 * k(T(PeggleData.settings.minimapAngle or 270))), (76 * I(T(PeggleData.settings.minimapAngle or 270))))
+		t.minimap:SetPoint("Center", Minimap, "Center",  - (compat.MinimapRadius() * k(T(PeggleData.settings.minimapAngle or 270))), (compat.MinimapRadius() * I(T(PeggleData.settings.minimapAngle or 270))))
 	else
 		t.minimap:SetPoint("Center", UIParent, "bottomleft", PeggleData.settings.minimapX, PeggleData.settings.minimapY);
 	end
@@ -8916,7 +8951,7 @@ local function w(n, l, ...)
 	n:RegisterEvent("PLAYER_REGEN_DISABLED");
 	n:RegisterEvent("READY_CHECK");
 	n:RegisterEvent("PLAYER_CONTROL_GAINED");
-	hooksecurefunc("TakeTaxiNode", function()
+	compat.hooksecurefunc("TakeTaxiNode", function()
 		t.flying = true;
 		if(PeggleData.settings.openFlightStart == true)then
 			t:Show();
@@ -8926,9 +8961,9 @@ local function w(n, l, ...)
 	if(Y[1])then
 	ne();
 	end
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", M)
+	compat.AddMessageEventFilter("CHAT_MSG_SYSTEM", M)
 	if not PeggleData.legalDisplayed then
-		local l = CreateFrame("Frame", "", t);
+		local l = compat.CreateFrame("Frame", "", t);
 		l:SetWidth(160 * 2);
 		l:SetHeight(216 + 32);
 		l:SetToplevel(true);
@@ -8955,7 +8990,7 @@ local function w(n, l, ...)
 		n:SetWidth(160 * 1.8);
 		n:Show();
 		n = l:CreateFontString(nil, "Overlay");
-		n:SetFont(STANDARD_TEXT_FONT, 12);
+		n:SetFont(STANDARD_TEXT_FONT, 12, "");
 		n:SetShadowColor(0, 0, 0);
 		n:SetShadowOffset(1,  - 1);
 		n:SetTextColor(1, 1, 1);
@@ -8976,7 +9011,7 @@ local function w(n, l, ...)
 		e:SetPoint("Top", n, "Bottom", 0,  - 16);
 		l:SetHeight(n:GetHeight() + e:GetHeight() + 120);
 	end
-	local n = CreateFrame("Frame", "", t);
+	local n = compat.CreateFrame("Frame", "", t);
 	n:SetWidth(290);
 	n:SetHeight(90 + 32);
 	n:SetToplevel(true);
@@ -8997,7 +9032,7 @@ local function w(n, l, ...)
 	n:SetBackdropBorderColor(1, .8, .45);
 	n:SetBackdropBorderColor(1, 1, 1);
 	text = n:CreateFontString(nil, "Overlay");
-	text:SetFont(STANDARD_TEXT_FONT, 12);
+	text:SetFont(STANDARD_TEXT_FONT, 12, "");
 	text:SetShadowColor(0, 0, 0);
 	text:SetShadowOffset(1,  - 1);
 	text:SetTextColor(1, 1, 1);
@@ -9027,10 +9062,7 @@ local function w(n, l, ...)
 		t.splash.background:SetAlpha(1);
 		t.splash.foreground:SetAlpha(1);
 	end
-	if(not AchievementFrame)then
-		AchievementFrame_LoadUI();
-	end
-	local n = CreateFrame("Button", "exhibitA", UIParent, "AchievementAlertFrameTemplate");
+	local n = compat.CreateToast("exhibitA", UIParent);
 	n:Hide();
 	n:ClearAllPoints();
 	n:SetPoint("BOTTOM", 0, 128);
@@ -9046,14 +9078,11 @@ local function w(n, l, ...)
 	n:SetScript("OnEvent", function(e)
 		if(t.duelStatus == 3)and not PeggleData.exhibitA then
 			PeggleData.exhibitA = true;
-			if(not AchievementFrame)then
-				AchievementFrame_LoadUI();
-			end
 			e.elapsed = 0;
 			e.state = nil;
 			e:SetAlpha(0);
 			e.id = 0;
-			e:SetScript("OnUpdate", AchievementAlertFrame_OnUpdate);
+			e:SetScript("OnUpdate", compat.ToastOnUpdate);
 			e:UnregisterAllEvents();
 			e:Show();
 		end
@@ -9067,23 +9096,20 @@ local function w(n, l, ...)
 	l:SetTexCoord(o[2], o[3], o[1], o[3], o[2], o[4], o[1], o[4]);
 	n.tex = l;
 	o = e.artCut["exhibitA2"];
-	--getglobal(n:GetName().."IconTexture"):SetTexture(e.artPath.."howtoplay");
-	--getglobal(n:GetName().."IconTexture"):SetTexCoord(unpack(o));
-	--getglobal(n:GetName().."Name"):SetText("");
-	--local l = getglobal(n:GetName().."Shield");
-	if(l.points)then
-		AchievementShield_SetPoints(10, l.points, GameFontNormal, GameFontNormalSmall);
-	end
+	--compat.Child(n, "IconTexture"):SetTexture(e.artPath.."howtoplay");
+	--compat.Child(n, "IconTexture"):SetTexCoord(unpack(o));
+	--compat.Child(n, "Name"):SetText("");
+	--local l = compat.Child(n, "Shield");
 	if(l.icon)then
 		l.icon:SetTexture("Interface\\AchievementFrame\\UI-Achievement-Shields");
 	end
-	--getglobal(n:GetName().."Unlocked"):ClearAllPoints();
-	--getglobal(n:GetName().."Unlocked"):SetPoint("Top", 0,  - 39)o = e.artCut["exhibitA2"];
-	--getglobal(n:GetName().."IconTexture"):SetTexture(e.artPath.."howtoplay");
-	--getglobal(n:GetName().."IconTexture"):SetTexCoord(unpack(o));
+	--compat.Child(n, "Unlocked"):ClearAllPoints();
+	--compat.Child(n, "Unlocked"):SetPoint("Top", 0,  - 39)o = e.artCut["exhibitA2"];
+	--compat.Child(n, "IconTexture"):SetTexture(e.artPath.."howtoplay");
+	--compat.Child(n, "IconTexture"):SetTexCoord(unpack(o));
 	e.artCut = nil;
 	if(a)then
-		message(e.locale["PEGGLE_ISSUE2"])
+		compat.message(e.locale["PEGGLE_ISSUE2"])
 		t:Hide();
 		t.minimap:Hide();
 		if(t.legal)then
@@ -9104,7 +9130,7 @@ local function w(n, l, ...)
 end
 local function W()
 	local d = e.artCut;
-	t = CreateFrame("Frame", "PeggleWindow", UIParent);
+	t = compat.CreateFrame("Frame", "PeggleWindow", UIParent);
 	t:SetWidth(e.windowWidth);
 	t:SetHeight(e.windowHeight);
 	t:SetPoint("Center");
@@ -9114,7 +9140,7 @@ local function W()
 	t:SetHitRectInsets(0, 0,  - 14, 0);
 	t:RegisterEvent("VARIABLES_LOADED");
 	t:SetScript("OnEvent", w);
-	t.mouseBounds = CreateFrame("Frame", "", t);
+	t.mouseBounds = compat.CreateFrame("Frame", "", t);
 	t.mouseBounds:SetPoint("Topleft",  - 20, 20);
 	t.mouseBounds:SetPoint("Bottomright", 20,  - 20);
 	t.mouseBounds:Show();
@@ -9146,9 +9172,9 @@ local function W()
 	n:SetPoint("Topleft", 2, 0);
 	n:SetPoint("Topright",  - 8, 0);
 	n:SetHeight(26);
-	n:SetTexture(0, 0, 0);
+	n:SetColorTexture(0, 0, 0);
 	t.coverUp = n;
-	local l = CreateFrame("Frame", "", t);
+	local l = compat.CreateFrame("Frame", "", t);
 	l:SetHeight(128);
 	l:SetPoint("Topleft", t, "Topleft", 32, 32);
 	l:SetPoint("Topright", t, "Topright", 0, 32);
@@ -9192,7 +9218,7 @@ local function W()
 				end
 				PeggleData.settings.soundVolume = 2;
 			end
-			local t = getglobal("PeggleCheckbox_soundVolume"..PeggleData.settings.soundVolume + 1);
+			local t = compat.getglobal("PeggleCheckbox_soundVolume"..PeggleData.settings.soundVolume + 1);
 			if not t.updating then
 				e.updating = true;
 				t:GetScript("OnClick")(t);
@@ -9228,7 +9254,7 @@ local function W()
 	r.highlight:SetWidth(r:GetWidth() - 6);
 	r.highlight:SetHeight(r:GetHeight() - 8);
 	t.menuButton = r;
-	local a = CreateFrame("Frame", "", t);
+	local a = compat.CreateFrame("Frame", "", t);
 	a:SetWidth(1);
 	a:SetHeight(1);
 	a:SetAllPoints(t);
@@ -9297,13 +9323,13 @@ local function W()
 	le();
 	re();
 	local r = t.feverTracker;
-	l = CreateFrame("Frame", "", t);
+	l = compat.CreateFrame("Frame", "", t);
 	l:SetFrameLevel(t:GetFrameLevel() + 4);
 	l:SetPoint("Topleft",  - 12, 4);
 	l:SetWidth(64);
 	l:SetHeight(64);
 	seg = d["logoArt"];
-	local o = CreateFrame("Frame", "", t);
+	local o = compat.CreateFrame("Frame", "", t);
 	o:SetPoint("Top", 12, 12);
 	o:SetWidth(i((seg[4] - seg[3]) * 512 + .5));
 	o:SetHeight(i((seg[2] - seg[1]) * 512 + .5));
@@ -9316,7 +9342,7 @@ local function W()
 	a:SetTexture(e.artPath.."board1");
 	a:SetTexCoord(seg[2], seg[3], seg[1], seg[3], seg[2], seg[4], seg[1], seg[4]);
 	t.logo = a;
-	local o = CreateFrame("Frame", "", t);
+	local o = compat.CreateFrame("Frame", "", t);
 	o:SetPoint("Bottomright", 0, 0);
 	o:SetWidth(32);
 	o:SetHeight(32);
@@ -9342,8 +9368,7 @@ local function W()
 	n:SetHeight(32);
 	n:SetTexture(e.artPath.."resize");
 	t.logo = a;
-	t:SetMaxResize(e.windowWidth * 1.5, e.windowHeight * 1.5);
-	t:SetMinResize(e.windowWidth / 2, e.windowHeight / 2);
+	compat.SetResizeBounds(t, e.windowWidth / 2, e.windowHeight / 2, e.windowWidth * 1.5, e.windowHeight * 1.5);
 	t:SetResizable(true);
 	t:SetScript("OnSizeChanged", function(o)
 		local n = o:GetWidth();
@@ -9362,7 +9387,7 @@ local function W()
 		e = f(e, 128) / 128 + i(e / 128);
 		n:SetTexCoord(0, e, 0, 1);
 	end);
-	l = CreateFrame("Frame", "PeggleShowHideButton", UIParent);
+	l = compat.CreateFrame("Frame", "PeggleShowHideButton", UIParent);
 	l:SetWidth(1);
 	l:SetHeight(1);
 	l:SetPoint("Bottomright");
@@ -9374,7 +9399,7 @@ local function W()
 		end
 	end);
 	t.showHideButton = l;
-	l = CreateFrame("Frame", "PeggleMouseOverSentry", t);
+	l = compat.CreateFrame("Frame", "PeggleMouseOverSentry", t);
 	l:SetPoint("Topleft", 0, 30);
 	l:SetPoint("Bottomright");
 	l:EnableMouse(false);
@@ -9397,7 +9422,7 @@ local function W()
 				t:SetAlpha(PeggleData.settings.mouseOffTrans);
 				e.fading = nil;
 			else
-				if not MouseIsOver(t)then
+				if not compat.MouseIsOver(t)then
 					if not t.resizing then
 						e:EnableMouse(true);
 						e.mouseOver = nil;
@@ -9422,13 +9447,13 @@ local function W()
 	t.mouseOverScreen = l;
 end
 local function w()
-	local e = CreateFrame("Frame", "", UIParent);
+	local e = compat.CreateFrame("Frame", "", UIParent);
 	e:SetWidth(1);
 	e:SetHeight(1);
 	e:EnableMouse(false);
 	e:SetAlpha(0);
 	e.elapsed = 0;
-	e.delay = .025;
+	e.delay = 0;
 	e:SetScript("OnUpdate", Ne);
 	e.tableCos = {}
 	e.tableSin = {}
@@ -9469,7 +9494,7 @@ local function w()
 	d = e;
 end
 local function _()
-	local o = CreateFrame("Frame", "PeggleCoinFlipper", r.foreground);
+	local o = compat.CreateFrame("Frame", "PeggleCoinFlipper", r.foreground);
 	o:SetWidth(196);
 	o:SetHeight(196);
 	o:SetPoint("Center", r, "Center", 0,  - 30);
@@ -9594,7 +9619,7 @@ local function b()
 	t.bonusBar5 = n;
 end
 local function E()
-	local n = CreateFrame("Frame", "", r.foreground);
+	local n = compat.CreateFrame("Frame", "", r.foreground);
 	n:SetWidth(20);
 	n:SetHeight(20);
 	n:SetPoint("Center", r, "Center");
@@ -9612,7 +9637,7 @@ local function E()
 	a:ClearAllPoints();
 	a:SetPoint("Center", r, "Center", 0, e.boardHeight / 4 - 44);
 	t.roundBonusScore = a;
-	n = CreateFrame("Frame", "", r.foreground);
+	n = compat.CreateFrame("Frame", "", r.foreground);
 	n:SetWidth(200);
 	n:SetHeight(24);
 	n:SetPoint("Center", r, "Center", 0, e.boardHeight / 4 - 44 - 24);
@@ -9652,7 +9677,7 @@ local function E()
 	a.caption1 = e.locale["BALLS_LEFT1"];
 	a.caption2 = e.locale["BALLS_LEFT2"];
 	n.text = a;
-	local r = CreateFrame("Frame", "", t.artBorder)
+	local r = compat.CreateFrame("Frame", "", t.artBorder)
 	r:SetPoint("Center");
 	r:SetWidth(20);
 	r:SetHeight(20);
@@ -9689,18 +9714,18 @@ local function E()
 	t.feverPegScore = a;
 end
 local function n()
-	physicsWindow = CreateFrame("Frame", "PhysicsEditingWindow", t);
+	physicsWindow = compat.CreateFrame("Frame", "PhysicsEditingWindow", t);
 	physicsWindow:SetPoint("TopLeft", t, "BottomLeft", 0,  - 20);
 	physicsWindow:SetPoint("TopRight", t, "BottomRight", 0,  - 20);
 	physicsWindow:SetHeight(60);
 	physicsWindow.background = physicsWindow:CreateTexture(nil, background);
 	physicsWindow.background:SetAllPoints(physicsWindow);
-	physicsWindow.background:SetTexture(0, 0, 0, .5);
+	physicsWindow.background:SetColorTexture(0, 0, 0, .5);
 	physicsWindow:Hide();
 	local e = o:CreateCaption(10, 15, "Gravity                       pixels/sec", physicsWindow, 12)
 	e:ClearAllPoints()
 	e:SetPoint("Bottomleft", t, "Bottomleft", 16,  - 45 - 25)
-	e = CreateFrame("EditBox", "PeggleEditBox1", physicsWindow, "InputBoxTemplate");
+	e = compat.CreateFrame("EditBox", "PeggleEditBox1", physicsWindow, "InputBoxTemplate");
 	e:SetPoint("Bottomleft", t, "Bottomleft", 70,  - 50 - 25)
 	e:SetWidth(64);
 	e:SetHeight(20);
@@ -9717,7 +9742,7 @@ local function n()
 	e = o:CreateCaption(200, 15, "Max glide hits                        hits", physicsWindow, 12)
 	e:ClearAllPoints()
 	e:SetPoint("Bottomleft", t, "Bottomleft", 280,  - 45 - 25)
-	e = CreateFrame("EditBox", "PeggleEditBox2", physicsWindow, "InputBoxTemplate");
+	e = compat.CreateFrame("EditBox", "PeggleEditBox2", physicsWindow, "InputBoxTemplate");
 	e:SetPoint("Bottomleft", t, "Bottomleft", 380,  - 50 - 25)
 	e:SetWidth(64);
 	e:SetHeight(20);
@@ -9734,7 +9759,7 @@ local function n()
 	e = o:CreateCaption(10,  - 15, "Shot Force                          pixels/sec", physicsWindow, 12)
 	e:ClearAllPoints()
 	e:SetPoint("Bottomleft", t, "Bottomleft", 16,  - 20 - 25)
-	e = CreateFrame("EditBox", "PeggleEditBox3", physicsWindow, "InputBoxTemplate");
+	e = compat.CreateFrame("EditBox", "PeggleEditBox3", physicsWindow, "InputBoxTemplate");
 	e:SetPoint("Bottomleft", t, "Bottomleft", 100,  - 25 - 25)
 	e:SetWidth(64);
 	e:SetHeight(20);
@@ -9751,7 +9776,7 @@ local function n()
 	e = o:CreateCaption(200,  - 15, "Elasticity (0.00 to 1.00 pls)", physicsWindow, 12)
 	e:ClearAllPoints()
 	e:SetPoint("Bottomleft", t, "Bottomleft", 300,  - 20 - 25)
-	e = CreateFrame("EditBox", "PeggleEditBox4", physicsWindow, "InputBoxTemplate");
+	e = compat.CreateFrame("EditBox", "PeggleEditBox4", physicsWindow, "InputBoxTemplate");
 	e:SetPoint("Bottomleft", t, "Bottomleft", 476,  - 25 - 25)
 	e:SetWidth(64);
 	e:SetHeight(20);
@@ -9768,7 +9793,7 @@ local function n()
 	x(490, 30, "Show block polys", "showPolys", true, physicsWindow, function(e)
 		showPoly = e:GetChecked();
 	end)
-	e = CreateFrame("Button", nil, physicsWindow, "OptionsButtonTemplate")
+	e = compat.CreateFrame("Button", nil, physicsWindow, "OptionsButtonTemplate")
 	e:SetText("Add Ball");
 	e:ClearAllPoints()
 	e:SetPoint("BottomRight", physicsWindow, "BottomRight",  - 10, 10)
@@ -9786,12 +9811,12 @@ local function G()
 			y[t][e] = {};
 		end
 	end
-	local n = CreateFrame("ScrollFrame", nil, t);
+	local n = compat.CreateFrame("ScrollFrame", nil, t);
 	n:SetWidth(e.boardWidth);
 	n:SetHeight(e.boardHeight);
 	n:SetPoint("Topleft", 53,  - 70);
 	n:Show();
-	r = CreateFrame("Frame", nil, t);
+	r = compat.CreateFrame("Frame", nil, t);
 	r:SetWidth(e.boardWidth);
 	r:SetHeight(e.boardHeight);
 	r:ClearAllPoints();
@@ -9887,7 +9912,7 @@ local function G()
 		e.updateShooter = true;
 		e.fineX, e.fineY = GetCursorPosition();
 	end);
-	r.foreground = CreateFrame("Frame", nil, r);
+	r.foreground = compat.CreateFrame("Frame", nil, r);
 	r.foreground:SetWidth(e.boardWidth);
 	r.foreground:SetHeight(e.boardHeight);
 	r.foreground:SetPoint("Topleft", 74,  - 70);
@@ -9922,7 +9947,7 @@ local function G()
 	n:SetTexture(e.artPath.."ball");
 	n:Hide();
 	t.shooter.ball = n;
-	local l = CreateFrame("Frame", "", t);
+	local l = compat.CreateFrame("Frame", "", t);
 	l:SetFrameLevel(t:GetFrameLevel() + 2);
 	l:SetWidth(10);
 	l:SetHeight(10);
@@ -9932,13 +9957,13 @@ local function G()
 	n:SetPoint("Center", t, "Top", 3,  - 101);
 	n:SetWidth(72);
 	n:SetHeight(50);
-	n:SetTexture(0, 0, 0);
+	n:SetColorTexture(0, 0, 0);
 	t.shooter.faceBG1 = n;
 	n = l:CreateTexture(nil, "Background");
 	n:SetPoint("Center", t, "Top", 2,  - 98);
 	n:SetWidth(50);
 	n:SetHeight(74);
-	n:SetTexture(0, 0, 0);
+	n:SetColorTexture(0, 0, 0);
 	t.shooter.faceBG2 = n;
 	n = l:CreateTexture(nil, "Artwork");
 	n:SetPoint("Center", t, "Top", 0,  - 101);
@@ -9947,7 +9972,7 @@ local function G()
 	n:SetTexture(e.artPath.."char1Face");
 	n:SetTexCoord(0, 1, 0 / 256, 72 / 256);
 	t.shooter.face = n;
-	l = CreateFrame("Frame", "", t.artBorder);
+	l = compat.CreateFrame("Frame", "", t.artBorder);
 	l:SetPoint("Top", t, "Top", 0,  - 30);
 	l:SetWidth(64);
 	l:SetHeight(64);
@@ -9971,7 +9996,7 @@ local function G()
 	o:ClearAllPoints();
 	o:SetPoint("Top", 0,  - 5);
 	t.powerLabel.text = o;
-	l = CreateFrame("Frame", "", t.artBorder);
+	l = compat.CreateFrame("Frame", "", t.artBorder);
 	l:SetWidth(1);
 	l:SetHeight(1);
 	l:SetPoint("Center", r, "Center");
@@ -10004,10 +10029,19 @@ local function G()
 	n:Hide();
 end
 local function y()
-	local n = CreateFrame("Frame", "PeggledMinimapIcon", Minimap);
+	local n = compat.CreateFrame("Frame", "PeggledMinimapIcon", Minimap);
 	n:SetWidth(33);
 	n:SetHeight(33);
-	n:SetFrameStrata("LOW");
+	-- Same layering LibDBIcon uses, so the icon sits above the minimap's
+	-- border art in the modern UI instead of underneath it.
+	n:SetFrameStrata("MEDIUM");
+	if(n.SetFixedFrameStrata)then
+		n:SetFixedFrameStrata(true);
+	end
+	n:SetFrameLevel(8);
+	if(n.SetFixedFrameLevel)then
+		n:SetFixedFrameLevel(true);
+	end
 	n:EnableMouse(true);
 	n:SetClampedToScreen(true);
 	n.icon = n:CreateTexture(nil, "Background");
@@ -10034,7 +10068,7 @@ local function y()
 	n.highlight:SetTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight");
 	n.highlight:SetBlendMode("ADD");
 	n.highlight:Hide();
-	n:SetPoint("Center",  - (76 * k(T(0))), (76 * I(T(0))))
+	n:SetPoint("Center",  - (compat.MinimapRadius() * k(T(0))), (compat.MinimapRadius() * I(T(0))))
 	n:Show();
 	n.elapsed = 0;
 	n:SetScript("OnMouseDown", function(e, t)
@@ -10050,7 +10084,7 @@ local function y()
 			if(t:IsVisible())then
 				t:Hide()
 			else
-				if not MouseIsOver(t)then
+				if not compat.MouseIsOver(t)then
 					t:SetAlpha(PeggleData.settings.mouseOnTrans);
 					t.mouseOverScreen:EnableMouse(true);
 					t.mouseOverScreen.mouseOver = nil;
@@ -10107,7 +10141,7 @@ local function y()
 				local t = gt(math.atan2((l / UIParent:GetScale()) - a, i - (o / UIParent:GetScale())));
 				PeggleData.settings.minimapAngle = t;
 				PeggleData.settings.minimapDetached = nil;
-				e:SetPoint("Center", Minimap, "Center",  - (76 * k(T(t))), (76 * I(T(t))))
+				e:SetPoint("Center", Minimap, "Center",  - (compat.MinimapRadius() * k(T(t))), (compat.MinimapRadius() * I(T(t))))
 			end
 		end
 		if(e.notice)then
@@ -10133,7 +10167,7 @@ local function y()
 	t.minimap = n;
 end
 local function N()
-	local n = CreateFrame("Frame", "PeggleLootTimer", UIParent);
+	local n = compat.CreateFrame("Frame", "PeggleLootTimer", UIParent);
 	n:SetWidth(1);
 	n:SetHeight(1);
 	n:SetPoint("Top");
@@ -10224,7 +10258,7 @@ local function N()
 		end
 	end);
 	t.peggleLootTimer = n;
-	n = CreateFrame("Frame", "", UIParent);
+	n = compat.CreateFrame("Frame", "", UIParent);
 	n:SetPoint("Center")
 	n:SetWidth(310);
 	n:SetHeight(230);
@@ -10305,7 +10339,7 @@ local function N()
 	n:SetPoint("Bottomright",  - 14, 14);
 end
 local function k()
-	local i = CreateFrame("Frame", "PeggleNet", UIParent);
+	local i = compat.CreateFrame("Frame", "PeggleNet", UIParent);
 	i:SetWidth(1);
 	i:SetHeight(1);
 	i:SetPoint("Top");
@@ -10355,7 +10389,7 @@ local function k()
 						C_ChatInfo.SendAddonMessage(l, o, t, n);
 						e.throttleCount = e.throttleCount + 1;
 					elseif(t == "RAID")or(t == "PARTY")then
-						SendChatMessage(o, t);
+						compat.SendChatMessage(o, t);
 						e.throttleCount = e.throttleCount + 1;
 					end
 					if(#e.queue == 0)then
@@ -10366,7 +10400,10 @@ local function k()
 		end
 	end);
 	i:SetScript("OnEvent", function(m, n, C, i, l, a)
-		a = string.match(a, "(.*)%-(.*)") or a
+		if compat.IsSecret(C, i, l, a) then
+			return;
+		end
+		a = a and (string.match(a, "(.*)%-(.*)") or a)
 		if(n == "CHAT_MSG_SYSTEM")and(m.watchError)then
 			if(string.find(C, m.watchError))then
 				m.watchError = nil;
@@ -10886,7 +10923,7 @@ local function k()
 		end
 	end);
 	t.network = i;
-	i = CreateFrame("Frame", "PeggleNetPing", UIParent);
+	i = compat.CreateFrame("Frame", "PeggleNetPing", UIParent);
 	i:SetWidth(1);
 	i:SetHeight(1);
 	i:SetPoint("Top");
@@ -10924,7 +10961,7 @@ local function k()
 		end
 	end);
 	t.network.pinger = i;
-	i = CreateFrame("Frame", "PeggleNetServer", UIParent);
+	i = compat.CreateFrame("Frame", "PeggleNetServer", UIParent);
 	i:SetWidth(1);
 	i:SetHeight(1);
 	i:SetPoint("Top");
@@ -11131,15 +11168,12 @@ local function T()
 			t:SetHeight(e.windowHeight);
 		elseif(n == "achievement")then
 			if(PeggleData.exhibitA)then
-				if(not AchievementFrame)then
-					AchievementFrame_LoadUI();
-				end
 				local e = t.achieve;
 				e.elapsed = 0;
 				e.state = nil;
 				e:SetAlpha(0);
 				e.id = 0;
-				e:SetScript("OnUpdate", AchievementAlertFrame_OnUpdate);
+				e:SetScript("OnUpdate", compat.ToastOnUpdate);
 				e:UnregisterAllEvents();
 				e:Show();
 			end
@@ -11162,7 +11196,7 @@ local function T()
 				return;
 			end
 			if(de ~= true)then
-				local e = getglobal("PeggleButton_menuAbandon");
+				local e = compat.getglobal("PeggleButton_menuAbandon");
 				e:GetScript("OnClick")(e);
 			end
 			local c = string.format(e.locale["_PEGGLELOOT_NOTIFY"], l)
@@ -11215,7 +11249,7 @@ local function T()
 			t.peggleLootTimer.serverRemaining = 40;
 			t.peggleLootTimer:Show();
 			if(n > 5)then
-					SendChatMessage(c, "RAID")
+					compat.SendChatMessage(c, "RAID")
 				for n = 1, n do
 					name = GetRaidRosterInfo(n);
 					if(name)then
@@ -11223,7 +11257,7 @@ local function T()
 					end
 				end
 			else
-				SendChatMessage(c, "PARTY")
+				compat.SendChatMessage(c, "PARTY")
 				t.network:Send(e.commands[20], l, "WHISPER", e.name);
 				n = 4
 				for n = 1, n do
