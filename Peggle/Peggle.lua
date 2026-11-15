@@ -3550,7 +3550,10 @@ local function Ne(o, n)
 	local C;
 	for e = 1, #o.activePointTextStack do
 		n = o.activePointTextStack[A];
-		C = n:Update(o.elapsed);
+		-- Score popups animate in real time. In slow motion (end of level)
+		-- game time moves them only ~12 pixels a second, and text snaps to
+		-- whole pixels, which reads as a very low frame rate.
+		C = n:Update(o.tickScale / 30);
 		if(C)then
 			u(d.activePointTextStack, A);
 		else
@@ -4283,6 +4286,16 @@ local function Ne(o, n)
 			A = A + 1;
 		end
 		ee = ee + 1;
+	end
+	-- Draw each ball ahead by the physics time not yet simulated, so it moves
+	-- every frame even when slow motion leaves several frames between steps.
+	if(o.physicsTime)and(o.physicsTime > 0)then
+		for e = 1, #X do
+			n = X[e];
+			if(n.isBall)and(n:IsShown())then
+				n:SetPoint("Center", r, "Bottomleft", n.x + n.xVel * o.physicsTime, n.y + n.yVel * o.physicsTime);
+			end
+		end
 	end
 	if(o.physicsSteps)and(o.physicsSteps > 0)then
 		o.shiftTrail = nil;
