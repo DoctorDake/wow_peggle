@@ -2187,8 +2187,8 @@ local function Je(r, o, l, e, i, a, d, t, n)
 	e:SetWidth(l);
 	e:SetHeight(32);
 	e:SetAutoFocus(false);
-	e:SetNumeric(a);
-	e:SetMaxLetters(d);
+	e:SetNumeric(a and true or false);
+	e:SetMaxLetters(d or 0);
 	e:SetHitRectInsets(0, 0, 8, 8);
 	e:Show();
 	if(t)then
