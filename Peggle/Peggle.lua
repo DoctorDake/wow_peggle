@@ -3542,7 +3542,7 @@ local function Ne(o, n)
 			if(n.angle >= 360)then
 				n.angle = n.angle - 360;
 			end
-			o:RotateTexture(n, n.angle, .5, .5);
+			o:RotateTexture(n, math.floor(n.angle), .5, .5);
 			n:SetPoint("Center", r, "BottomLeft", n.x, n.y);
 		end
 	end
