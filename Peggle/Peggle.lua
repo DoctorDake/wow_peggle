@@ -8919,7 +8919,7 @@ local function w(n, l, ...)
 	n:RegisterEvent("PLAYER_REGEN_DISABLED");
 	n:RegisterEvent("READY_CHECK");
 	n:RegisterEvent("PLAYER_CONTROL_GAINED");
-	hooksecurefunc("TakeTaxiNode", function()
+	compat.hooksecurefunc("TakeTaxiNode", function()
 		t.flying = true;
 		if(PeggleData.settings.openFlightStart == true)then
 			t:Show();

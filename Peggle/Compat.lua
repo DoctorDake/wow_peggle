@@ -104,6 +104,15 @@ local function CopyBackdrop(info)
 		end
 		copy[k] = v
 	end
+	-- The old API accepted any truthy value here (the addon passes tile = 1);
+	-- the mixin hands it straight to Texture:SetTexture as a wrap mode, which
+	-- only accepts a boolean or a wrap-mode string.
+	if copy.tile ~= nil then
+		copy.tile = copy.tile and true or false
+	end
+	if copy.tileEdge ~= nil then
+		copy.tileEdge = copy.tileEdge and true or false
+	end
 	return copy
 end
 
@@ -331,6 +340,13 @@ end
 
 function compat.SetDesaturation(texture, desaturated)
 	texture:SetDesaturated(desaturated and true or false)
+end
+
+-- hooksecurefunc errors when the target global does not exist.
+function compat.hooksecurefunc(name, hook)
+	if type(_G[name]) == "function" then
+		hooksecurefunc(name, hook)
+	end
 end
 
 function compat.message(text)
