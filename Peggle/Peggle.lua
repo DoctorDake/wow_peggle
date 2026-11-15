@@ -3419,7 +3419,17 @@ local function Ne(o, n)
 		o.elapsed = 0;
 		return;
 	end
-	o.elapsed = xe(o.elapsed, o.elapsed) * J;
+	-- The loop now runs every rendered frame instead of roughly every 33ms.
+	-- Anything that used to advance "once per tick" is scaled by tickScale
+	-- (1 == one old tick) so it keeps its original speed.
+	o.elapsed = xe(o.elapsed, .1);
+	o.tickScale = o.elapsed * 30;
+	o.trailElapsed = (o.trailElapsed or 0) + o.elapsed;
+	if(o.trailElapsed >= 1 / 30)then
+		o.trailElapsed = 0;
+		o.shiftTrail = true;
+	end
+	o.elapsed = o.elapsed * J;
 	if(e.speedy == true)then
 		o.elapsed = o.elapsed * 3;
 	end
@@ -3524,11 +3534,11 @@ local function Ne(o, n)
 			if(n.elapsed > n.life)then
 				n:SetAlpha(1 - ((n.elapsed - n.life) / .2));
 			end
-			n.x = n.x + n.xVel * J
-			n.y = n.y + n.yVel * J;
-			n.yVel = n.yVel + n.gravity * J;
+			n.x = n.x + n.xVel * J * o.tickScale
+			n.y = n.y + n.yVel * J * o.tickScale;
+			n.yVel = n.yVel + n.gravity * J * o.tickScale;
 			m = m + 1;
-			n.angle = n.angle + 10;
+			n.angle = n.angle + 10 * o.tickScale;
 			if(n.angle >= 360)then
 				n.angle = n.angle - 360;
 			end
@@ -3860,13 +3870,19 @@ local function Ne(o, n)
 			end
 		else
 		end
-		while(ee <= o.elapsed)do
+		-- Fixed 10ms physics steps fed from an accumulator, so ball speed no
+		-- longer depends on the frame rate. The 1.2 factor matches what the
+		-- old loop produced at 30/60 fps (four steps per 33ms tick).
+		o.physicsTime = (o.physicsTime or 0) + o.elapsed * 1.2;
+		o.physicsSteps = math.floor(o.physicsTime / x);
+		o.physicsTime = o.physicsTime - o.physicsSteps * x;
+		while(ee < o.physicsSteps)do
 			A = 1;
 			for T = 1, #X do
 				n = X[A];
 				if(n.isBall)then
 					n.gravMultiplier = 1;
-					if(ee == 0)then
+					if(ee == 0)and(o.shiftTrail)then
 						if(n.trail1:IsShown())then
 							for e = 30, 2,  - 1 do
 								n["trail"..e].x = n["trail"..(e - 1)].x
@@ -4266,7 +4282,10 @@ local function Ne(o, n)
 			end
 			A = A + 1;
 		end
-		ee = ee + x;
+		ee = ee + 1;
+	end
+	if(o.physicsSteps)and(o.physicsSteps > 0)then
+		o.shiftTrail = nil;
 	end
 	o.elapsed = 0;
 end
@@ -9421,7 +9440,7 @@ local function w()
 	e:EnableMouse(false);
 	e:SetAlpha(0);
 	e.elapsed = 0;
-	e.delay = .025;
+	e.delay = 0;
 	e:SetScript("OnUpdate", Ne);
 	e.tableCos = {}
 	e.tableSin = {}
