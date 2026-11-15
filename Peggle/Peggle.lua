@@ -10032,7 +10032,16 @@ local function y()
 	local n = compat.CreateFrame("Frame", "PeggledMinimapIcon", Minimap);
 	n:SetWidth(33);
 	n:SetHeight(33);
-	n:SetFrameStrata("LOW");
+	-- Same layering LibDBIcon uses, so the icon sits above the minimap's
+	-- border art in the modern UI instead of underneath it.
+	n:SetFrameStrata("MEDIUM");
+	if(n.SetFixedFrameStrata)then
+		n:SetFixedFrameStrata(true);
+	end
+	n:SetFrameLevel(8);
+	if(n.SetFixedFrameLevel)then
+		n:SetFixedFrameLevel(true);
+	end
 	n:EnableMouse(true);
 	n:SetClampedToScreen(true);
 	n.icon = n:CreateTexture(nil, "Background");
