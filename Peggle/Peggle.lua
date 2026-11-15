@@ -8911,7 +8911,7 @@ local function w(n, l, ...)
 		t.minimap:Hide();
 	end
 	if(PeggleData.settings.minimapDetached == nil)then
-		t.minimap:SetPoint("Center", Minimap, "Center",  - (76 * k(T(PeggleData.settings.minimapAngle or 270))), (76 * I(T(PeggleData.settings.minimapAngle or 270))))
+		t.minimap:SetPoint("Center", Minimap, "Center",  - (compat.MinimapRadius() * k(T(PeggleData.settings.minimapAngle or 270))), (compat.MinimapRadius() * I(T(PeggleData.settings.minimapAngle or 270))))
 	else
 		t.minimap:SetPoint("Center", UIParent, "bottomleft", PeggleData.settings.minimapX, PeggleData.settings.minimapY);
 	end
@@ -10059,7 +10059,7 @@ local function y()
 	n.highlight:SetTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight");
 	n.highlight:SetBlendMode("ADD");
 	n.highlight:Hide();
-	n:SetPoint("Center",  - (76 * k(T(0))), (76 * I(T(0))))
+	n:SetPoint("Center",  - (compat.MinimapRadius() * k(T(0))), (compat.MinimapRadius() * I(T(0))))
 	n:Show();
 	n.elapsed = 0;
 	n:SetScript("OnMouseDown", function(e, t)
@@ -10132,7 +10132,7 @@ local function y()
 				local t = gt(math.atan2((l / UIParent:GetScale()) - a, i - (o / UIParent:GetScale())));
 				PeggleData.settings.minimapAngle = t;
 				PeggleData.settings.minimapDetached = nil;
-				e:SetPoint("Center", Minimap, "Center",  - (76 * k(T(t))), (76 * I(T(t))))
+				e:SetPoint("Center", Minimap, "Center",  - (compat.MinimapRadius() * k(T(t))), (compat.MinimapRadius() * I(T(t))))
 			end
 		end
 		if(e.notice)then

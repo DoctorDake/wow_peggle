@@ -801,3 +801,16 @@ function compat.CreateDropDown(name, parent)
 	end)
 	return dropDown
 end
+
+-------------------------------------------------------------------------------
+-- Minimap
+-------------------------------------------------------------------------------
+-- Distance from the minimap centre to the icon. The addon hard-coded 76, which
+-- is the classic 140px minimap's radius plus 6; the modern minimap is larger.
+function compat.MinimapRadius()
+	local width = Minimap and Minimap:GetWidth()
+	if not width or width <= 0 then
+		return 76
+	end
+	return width / 2 + 6
+end
