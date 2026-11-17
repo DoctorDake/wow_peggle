@@ -1,5 +1,8 @@
 Changelog
 
+v3.3
+- Added level 14 (Karazhan): a clock ring of orbiting pegs under a curved dome, a spinning clock hand, tower staircases, battlements, bowls and sliding floor pegs
+
 v3.2
 - Game loop runs every rendered frame instead of ~30 times a second; ball physics uses a fixed step fed from an accumulator so speed no longer varies with frame rate
 
